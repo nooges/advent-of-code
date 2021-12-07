@@ -18,9 +18,9 @@ def part1():
     with open(input_file, 'r') as reader:
         lines = reader.read()
         commands = [x.split() for x in lines.split('\n')]
-        print(commands)
+        # print(commands)
         position_changes = [parse_command(command) for command in commands]
-        print(position_changes)
+        # print(position_changes)
         horizontal_change = sum([x[0] for x in position_changes])
         print(horizontal_change)
         depth_change = sum([x[1] for x in position_changes])
@@ -28,4 +28,26 @@ def part1():
         print(horizontal_change * depth_change)
 
 
-part1()
+def part2():
+    with open(input_file, 'r') as reader:
+        lines = reader.read()
+        commands = [x.split() for x in lines.split('\n')]
+        position_changes = [parse_command(command) for command in commands]
+        horizontal_change = sum([x[0] for x in position_changes])
+        depth = 0
+        aim = 0
+        for command in position_changes:
+            change_aim = command[0] == 0
+            if change_aim:
+                aim += command[1]
+            else:
+                depth += aim*command[0]
+
+        print(horizontal_change)
+        print(aim)
+        print(depth)
+        print(horizontal_change * depth)
+
+
+# part1()
+part2()
