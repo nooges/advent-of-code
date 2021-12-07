@@ -15,7 +15,7 @@ def part1():
         bit_counts = [0] * num_bits
         for value in values:
             for bit in range(num_bits):
-                bit_counts[bit] += (value >> (num_bits - bit - 1)) & 1
+                bit_counts[bit] += (value >> bit) & 1
 
         print(bit_counts)
 
@@ -23,7 +23,7 @@ def part1():
         print(most_common_bits)
 
         gamma_rate = functools.reduce(
-            lambda x, y: x << 1 | y, most_common_bits)
+            lambda x, y: x << 1 | y, reversed(most_common_bits))
         print(gamma_rate)
         epsilon_rate = ((1 << num_bits) - 1) ^ gamma_rate
         print(epsilon_rate)
