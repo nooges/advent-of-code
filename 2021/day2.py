@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-input_file = 'input.txt'
+input_file = 'data/day2-input.txt'
 
 
 def parse_command(command):
