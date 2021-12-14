@@ -24,11 +24,5 @@ let part2 =
     |> countIncreases
     |> (printfn "%A")
 
-//lines
-//|> Seq.map int
-//|> Seq.pairwise
-//|> Seq.map (fun (a, b) -> a > b)
-//|> Seq.iter (printfn "%A")
-
 part1
 part2
