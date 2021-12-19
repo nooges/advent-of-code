@@ -2,7 +2,7 @@
 
 open System.IO
 
-let lines = File.ReadLines("data/day3-sample.txt")
+let lines = File.ReadLines("data/day3-input.txt")
 
 let countCols acc bitList =
     Seq.zip acc bitList
@@ -16,10 +16,29 @@ let mostCommonBit bitsList pos =
         |> Seq.filter (fun a -> a.[pos] = '1')
         |> Seq.length
 
-    if count >= (Seq.length bitsList) / 2 then
+    if count >= (Seq.length bitsList - count) then
         '1'
     else
         '0'
+
+let leastCommonBit bitsList pos =
+
+    let count =
+        bitsList
+        |> Seq.map Seq.toList
+        |> Seq.filter (fun a -> a.[pos] = '0')
+        |> Seq.length
+
+    if count <= (Seq.length bitsList - count) then
+        '0'
+    else
+        '1'
+
+let bitlistToInt (bitList: seq<char>) =
+    let bitStr =
+        bitList |> Array.ofSeq |> System.String.Concat
+
+    int ("0b" + bitStr)
 
 let part1 =
     let numBits = Seq.head lines |> Seq.length
@@ -36,50 +55,42 @@ let part1 =
     let epsilonRate = ((1 <<< numBits) - 1) ^^^ gammaRate
     gammaRate * epsilonRate
 
-(*
-let gammaRateStr bitsList =
-    let numBits = Seq.head lines |> Seq.length
-    let initCounts: int [] = Array.zeroCreate numBits
-    let numLines = Seq.length bitsList
-
-    lines
-    |> Seq.map Seq.toList
-    |> Seq.fold countCols initCounts
-    |> Seq.map (fun a -> if a > numLines / 2 then "1" else "0")
-    |> String.concat ""
-
-let gammaRateBits bitsList = gammaRateStr bitsList |> Seq.toList
-*)
-
-(*
 let filterBits bitsList (criteria: list<char>) pos =
     bitsList
     |> Seq.map Seq.toList
     |> Seq.filter (fun bits -> bits.[pos] = criteria.[pos])
 
-let rec computeRatingHelper bitsList pos =
+let printBitslist b = b |> Seq.iter (printfn "%A")
+
+let rec computeRatingHelper bitsList f pos =
     if Seq.length bitsList = 1 then
         Seq.head bitsList
     else
-        // TODO: Make new criteria
-        printfn "%A" criteria
-        let filteredList = filterBits bitsList criteria pos
-        printfn "%d: %A" pos filteredList
-        computeRatingHelper filteredList (pos + 1)
+        let criteria = f bitsList pos
+        printfn "Criteria (%d): %A" pos criteria
+
+        let filteredList =
+            bitsList
+            |> Seq.map Seq.toList
+            |> Seq.filter (fun bits -> bits.[pos] = criteria)
+
+        printBitslist filteredList
+
+        computeRatingHelper filteredList f (pos + 1)
 
 let part2 =
 
     let bitsList = lines |> Seq.map Seq.toList
 
-    let oxygenGeneratorRating = computeRatingHelper bitsList 0
+    let oxygenGeneratorRating =
+        computeRatingHelper bitsList mostCommonBit 0
+        |> bitlistToInt
 
-    oxygenGeneratorRating
-*)
+    let co2ScrubberRating =
+        computeRatingHelper bitsList leastCommonBit 0
+        |> bitlistToInt
 
-//filterBits lines gammaRateBits 0
-
-//|> Seq.iter (printfn "%A")
-//|> Seq.length
+    oxygenGeneratorRating * co2ScrubberRating
 
 printfn "Part 1: %A" part1
-//printfn "Part 2: %A" part2
+printfn "Part 2: %A" part2
