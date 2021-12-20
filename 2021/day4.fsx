@@ -24,7 +24,18 @@ let boards =
     |> Seq.chunkBySize 5
     |> Seq.map boardLinesToArray
 
-let part1 = 0
+let markBoard draw board boardMarks =
+    (board, boardMarks)
+    ||> Array.map2 (fun line lineMarks ->
+        (line, lineMarks)
+        ||> Array.map2 (fun n mark -> mark || n = draw))
+
+let part1 =
+    let initialBoardMarks = Array.create 5 (Array.create 5 false)
+
+    boards
+    |> Seq.map (fun b -> markBoard 7 b initialBoardMarks)
+
 let part2 = 0
 
 printfn "Draws: %A" draws
