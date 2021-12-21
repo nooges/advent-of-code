@@ -32,6 +32,10 @@ let markBoard draw board boardMarks =
         (line, lineMarks)
         ||> Array.map2 (fun n mark -> mark || n = draw))
 
+let markBoards draw boards boardsMarks =
+    (boards, boardsMarks)
+    ||> Array.map2 (fun board boardMarks -> markBoard draw board boardMarks)
+
 let isBoardComplete boardMarks =
     // Check rows
     let hasWinningRow =
@@ -45,6 +49,14 @@ let isBoardComplete boardMarks =
         |> Array.contains true
 
     hasWinningRow || hasWinningCol
+
+let unmarkedSum board marks =
+    (board, marks)
+    ||> Array.map2 (fun b m ->
+        (b, m)
+        ||> Array.map2 (fun e1 e2 -> if e2 then 0 else e1)
+        |> Array.sum)
+    |> Array.sum
 
 let part1 =
     let initialBoardMarks =
@@ -61,13 +73,7 @@ let part1 =
             | true ->
                 { marks = boardMarks
                   lastDraw = lastDraw }
-            | false ->
-                markedBoardsHelper
-                    draws.[0]
-                    (Array.tail draws)
-                    boards
-                    ((boards, boardMarks)
-                     ||> Array.map2 (fun b m -> markBoard draws.[0] b m))
+            | false -> markedBoardsHelper draws.[0] (Array.tail draws) boards (markBoards draws.[0] boards boardMarks)
 
         markedBoardsHelper 0 draws boards initialBoardMarks
 
@@ -76,15 +82,8 @@ let part1 =
         |> Array.map isBoardComplete
         |> Array.findIndex id
 
-    let unmarkedSum =
-        (boards.[winningBoardNum], winningInfo.marks.[winningBoardNum])
-        ||> Array.map2 (fun b m ->
-            (b, m)
-            ||> Array.map2 (fun e1 e2 -> if e2 then 0 else e1)
-            |> Array.sum)
-        |> Array.sum
-
-    unmarkedSum * winningInfo.lastDraw
+    (unmarkedSum boards.[winningBoardNum] winningInfo.marks.[winningBoardNum])
+    * winningInfo.lastDraw
 
 let part2 =
     let initialBoardMarks =
@@ -109,8 +108,7 @@ let part2 =
                     (Array.tail draws)
                     boards
                     boardMarks
-                    ((boards, boardMarks)
-                     ||> Array.map2 (fun b m -> markBoard draws.[0] b m))
+                    (markBoards draws.[0] boards boardMarks)
 
         markedBoardsHelper 0 draws boards initialBoardMarks initialBoardMarks
 
@@ -119,19 +117,13 @@ let part2 =
         |> Array.map isBoardComplete
         |> Array.findIndex (fun x -> x = false)
 
-    let unmarkedSum =
-        (boards.[lastWinningBoardNum], winningInfo.marks.[lastWinningBoardNum])
-        ||> Array.map2 (fun b m ->
-            (b, m)
-            ||> Array.map2 (fun e1 e2 -> if e2 then 0 else e1)
-            |> Array.sum)
-        |> Array.sum
-        |> (fun x -> x - winningInfo.lastDraw)
-
     printfn "%d" lastWinningBoardNum
     printfn "%A" winningInfo.marks
     printfn "%A" unmarkedSum
-    unmarkedSum * winningInfo.lastDraw
+
+    ((unmarkedSum boards.[lastWinningBoardNum] winningInfo.marks.[lastWinningBoardNum])
+     - winningInfo.lastDraw)
+    * winningInfo.lastDraw
 
 printfn "Draws: %A" draws
 printfn "Boards: %A" boards
