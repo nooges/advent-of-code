@@ -86,10 +86,52 @@ let part1 =
 
     unmarkedSum * winningInfo.lastDraw
 
-//boards
-//|> Seq.map (fun b -> markBoard 7 b initialBoardMarks)
+let part2 =
+    let initialBoardMarks =
+        Array.create (Seq.length boards) (Array.create 5 (Array.create 5 false))
 
-let part2 = 0
+    let winningInfo =
+        let rec markedBoardsHelper lastDraw (draws: int []) boards lastBoardMarks boardMarks =
+            let allBoardsWin =
+                boardMarks
+                |> Array.map isBoardComplete
+                |> Array.forall id
+
+            printfn "%d" lastDraw
+
+            match allBoardsWin with
+            | true ->
+                { marks = lastBoardMarks
+                  lastDraw = lastDraw }
+            | false ->
+                markedBoardsHelper
+                    draws.[0]
+                    (Array.tail draws)
+                    boards
+                    boardMarks
+                    ((boards, boardMarks)
+                     ||> Array.map2 (fun b m -> markBoard draws.[0] b m))
+
+        markedBoardsHelper 0 draws boards initialBoardMarks initialBoardMarks
+
+    let lastWinningBoardNum =
+        winningInfo.marks
+        |> Array.map isBoardComplete
+        |> Array.findIndex (fun x -> x = false)
+
+    let unmarkedSum =
+        (boards.[lastWinningBoardNum], winningInfo.marks.[lastWinningBoardNum])
+        ||> Array.map2 (fun b m ->
+            (b, m)
+            ||> Array.map2 (fun e1 e2 -> if e2 then 0 else e1)
+            |> Array.sum)
+        |> Array.sum
+        |> (fun x -> x - winningInfo.lastDraw)
+
+    printfn "%d" lastWinningBoardNum
+    printfn "%A" winningInfo.marks
+    printfn "%A" unmarkedSum
+    unmarkedSum * winningInfo.lastDraw
 
 printfn "Draws: %A" draws
 printfn "Boards: %A" boards
