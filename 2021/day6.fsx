@@ -39,7 +39,36 @@ let part1 =
     trackFish numDays initialFishTimers
     |> Array.length
 
-let part2 = 0
+let updateCounts (counts: bigint array) =
+    let numNewFish = counts.[0]
+
+    let newCounts =
+        Array.concat [| counts.[1..8]
+                        [| numNewFish |] |]
+
+    newCounts.[6] <- newCounts.[6] + numNewFish
+    newCounts
+
+let part2 =
+    let fishCounts = Array.create (newFishTime + 1) 0I
+    let numDays = 256
+
+    inputLine
+    |> Seq.head
+    |> (fun x -> x.Split ',')
+    |> Array.map int
+    |> Array.iter (fun x -> fishCounts.[x] <- fishCounts.[x] + 1I)
+
+
+    let rec trackFish days counts =
+        printfn "%d: %A" days counts
+
+        match days with
+        | 0 -> counts
+        | _ -> trackFish (days - 1) (updateCounts counts)
+
+    trackFish numDays fishCounts |> Array.sum
+
 
 printfn "Part 1: %A" part1
 printfn "Part 2: %A" part2
