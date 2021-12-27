@@ -2,7 +2,7 @@
 
 open System.IO
 
-let lines = File.ReadLines("data/day3-sample.txt")
+let inputLines = File.ReadLines("data/day3-sample.txt")
 
 let part1 = 0
 let part2 = 0
