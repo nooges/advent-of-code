@@ -29,6 +29,10 @@ let riskLevel height adjPoints (map: int [,]) =
         | true -> height + 1
         | false -> 0)
 
+let unmarkedNeighbors x y (marks: Option<int> [,]) =
+    adjacentPoints x y marks
+    |> Array.filter (fun (x2, y2) -> marks.[x2, y2] = None)
+
 let hmap =
     inputLines
     |> Seq.map (fun line ->
@@ -44,7 +48,51 @@ let part1 =
     |> Seq.cast<int>
     |> Seq.sum
 
-let part2 = 0
+let part2 =
+    // Generate basin marks array
+    let basinMarks =
+        hmap
+        |> Array2D.map (fun h ->
+            match h with
+            | 9 -> Some -1
+            | _ -> None)
+
+    // Mark low points
+    let lowPoints =
+        hmap
+        |> Array2D.mapi (fun x y h ->
+            match (isLowPoint h (adjacentPoints x y hmap) hmap) with
+            | true -> Some(x, y)
+            | false -> None)
+        |> Seq.cast<Option<int * int>>
+        |> Seq.choose id
+
+    lowPoints
+    |> Seq.iteri (fun i (x, y) -> basinMarks.[x, y] <- Some i)
+
+    let rec findBasinPoints x y h marks : Set<(int * int)> =
+        let near = unmarkedNeighbors x y marks
+
+        match near.Length with
+        | 0 -> Set.empty
+        | _ ->
+            near
+            |> Array.iter (fun (xi, yi) -> marks.[xi, yi] <- Some h)
+
+            let newPoints =
+                near
+                |> Array.map (fun (xi, yi) -> findBasinPoints xi yi h marks)
+                |> Set.unionMany
+
+            Set.union (near |> Set.ofArray) newPoints
+
+    // For each low point, find unmarked areas around them and mark
+    lowPoints
+    |> Seq.mapi (fun i (x, y) -> findBasinPoints x y i basinMarks)
+    |> Seq.map (fun b -> b.Count + 1)
+    |> Seq.sortDescending
+    |> Seq.take 3
+    |> Seq.reduce (*)
 
 printfn "Part 1: %A" part1
 printfn "Part 2: %A" part2
