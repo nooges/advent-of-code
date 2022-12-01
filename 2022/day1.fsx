@@ -2,18 +2,12 @@
 
 open System.IO
 
-let inputLines = File.ReadLines("data/day1-input.txt")
-
 let amountCarried =
-    inputLines
-    |> Seq.map (fun x ->
-        match x with
-        | "" -> " "
-        | _ -> x)
-    |> String.concat ","
-    |> (fun x -> x.Split " ")
-    |> Array.map (fun group -> group.Trim(','))
-    |> Array.map (fun group -> group.Split "," |> Array.map int |> Array.sum)
+    File.ReadAllText("data/day1-input.txt")
+    |> (fun x -> x.Trim())
+    |> (fun x -> x.Split("\n\n"))
+    |> Array.map (fun x -> x.Split("\n"))
+    |> Array.map (fun group -> group |> Array.map int |> Array.sum)
 
 let part1 = amountCarried |> Array.max
 
