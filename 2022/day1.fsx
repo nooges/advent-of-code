@@ -4,7 +4,7 @@ open System.IO
 
 let inputLines = File.ReadLines("data/day1-input.txt")
 
-let part1 =
+let amountCarried =
     inputLines
     |> Seq.map (fun x ->
         match x with
@@ -14,9 +14,14 @@ let part1 =
     |> (fun x -> x.Split " ")
     |> Array.map (fun group -> group.Trim(','))
     |> Array.map (fun group -> group.Split "," |> Array.map int |> Array.sum)
-    |> Array.max
 
-let part2 = 0
+let part1 = amountCarried |> Array.max
+
+let part2 =
+    amountCarried
+    |> Array.sortDescending
+    |> Array.take 3
+    |> Array.sum
 
 printfn "Part 1: %A" part1
 printfn "Part 2: %A" part2
