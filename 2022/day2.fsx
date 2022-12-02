@@ -43,8 +43,10 @@ let roundScore oppMove myMove =
 
 let part1 =
     strategyGuide
-    |> Seq.map (fun line -> line |> Array.map codeToMove)
-    |> Seq.map (fun line -> roundScore line[0] line[1])
+    |> Seq.map (fun line ->
+        line
+        |> Array.map codeToMove
+        |> (fun x -> roundScore x[0] x[1]))
     |> Seq.sum
 
 let neededMove =
@@ -60,8 +62,9 @@ let neededMove =
 
 let part2 =
     strategyGuide
-    |> Seq.map (fun line -> (codeToMove line[0], codeToResult line[1]))
-    |> Seq.map (fun line -> roundScore (fst line) (neededMove line))
+    |> Seq.map (fun line ->
+        (codeToMove line[0], codeToResult line[1])
+        |> (fun x -> roundScore (fst x) (neededMove x)))
     |> Seq.sum
 
 printfn "Part 1: %A" part1
