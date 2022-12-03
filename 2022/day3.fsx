@@ -11,12 +11,10 @@ let part1 =
     inputLines
     |> Seq.map (fun line ->
         line
-        |> Seq.toArray
-        |> Array.splitInto 2
-        |> Array.map Set.ofArray
+        |> Seq.splitInto 2
+        |> Seq.map Set.ofSeq
         |> Set.intersectMany
-        |> Set.toList
-        |> List.head
+        |> Seq.head
         |> priority)
     |> Seq.sum
 
@@ -27,8 +25,7 @@ let part2 =
         group
         |> Seq.map Set.ofSeq
         |> Set.intersectMany
-        |> Set.toList
-        |> List.head
+        |> Seq.head
         |> priority)
     |> Seq.sum
 
