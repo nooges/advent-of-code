@@ -14,13 +14,23 @@ let part1 =
         |> Seq.toArray
         |> Array.splitInto 2
         |> Array.map Set.ofArray
-        |> (fun sacks -> Set.intersect sacks[0] sacks[1])
+        |> Set.intersectMany
         |> Set.toList
-        |> List.map priority
-        |> List.head)
+        |> List.head
+        |> priority)
     |> Seq.sum
 
-let part2 = 0
+let part2 =
+    inputLines
+    |> Seq.chunkBySize 3
+    |> Seq.map (fun group ->
+        group
+        |> Seq.map Set.ofSeq
+        |> Set.intersectMany
+        |> Set.toList
+        |> List.head
+        |> priority)
+    |> Seq.sum
 
 printfn "Part 1: %A" part1
 printfn "Part 2: %A" part2
