@@ -2,10 +2,7 @@
 
 let inputLines = System.IO.File.ReadLines("data/day3-input.txt")
 
-let priority =
-    function
-    | c when int c > 96 -> int c - 96
-    | c -> int c - 38
+let priority c = (int c - 38) % 58
 
 let part1 =
     inputLines
