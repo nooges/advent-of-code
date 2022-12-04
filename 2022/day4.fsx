@@ -11,16 +11,12 @@ let assignments =
         |> Array.map (split '-' >> Array.map int))
 
 let containsRange (a: int []) (b: int []) =
-    match (a, b) with
-    | (x, y) when x[0] <= y[0] && x[1] >= y[1] -> true
-    | (y, x) when x[0] <= y[0] && x[1] >= y[1] -> true
-    | _ -> false
+    (a[0] <= b[0] && a[1] >= b[1])
+    || (b[0] <= a[0] && b[1] >= a[1])
 
 let rangesOverlap (a: int []) (b: int []) =
-    match (a, b) with
-    | (x, y) when x[0] <= y[0] && y[0] <= x[1] -> true
-    | (y, x) when x[0] <= y[0] && y[0] <= x[1] -> true
-    | _ -> false
+    (a[0] <= b[0] && b[0] <= a[1])
+    || (b[0] <= a[0] && a[0] <= b[1])
 
 let part1 =
     assignments
