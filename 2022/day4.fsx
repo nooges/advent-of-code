@@ -24,14 +24,12 @@ let rangesOverlap (a: int []) (b: int []) =
 
 let part1 =
     assignments
-    |> Seq.map (fun x -> containsRange x[0] x[1])
-    |> Seq.filter id
+    |> Seq.filter (fun x -> containsRange x[0] x[1])
     |> Seq.length
 
 let part2 =
     assignments
-    |> Seq.map (fun x -> rangesOverlap x[0] x[1])
-    |> Seq.filter id
+    |> Seq.filter (fun x -> rangesOverlap x[0] x[1])
     |> Seq.length
 
 printfn "Part 1: %A" part1
