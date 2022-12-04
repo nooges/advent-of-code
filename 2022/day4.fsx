@@ -1,6 +1,7 @@
 #!/usr/bin/env -S dotnet fsi
 
-let split c (s: System.String) = s.Split([| c |])
+#load "Utils.fs"
+open AOC.Utils
 
 let assignments =
     System.IO.File.ReadLines("data/day4-input.txt")
