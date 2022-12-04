@@ -1,5 +1,7 @@
 namespace AOC
 
+open System
+
 module Utils =
 
-    let split c (s: System.String) = s.Split([| c |])
+    let split c (s: string) = s.Split([| c |])
