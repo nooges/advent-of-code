@@ -48,31 +48,39 @@ let moves =
     |> Array.skip startLineNum
     |> Array.map parseMove
 
-let moveOneCrate (src: int) (dst: int) (stacks: char list array) =
-    let crate = stacks[src - 1].Head
-    stacks[dst - 1] <- crate :: stacks[dst - 1]
-    stacks[src - 1] <- stacks[src - 1].Tail
-    //printfn "new stacks: %A" stacks
-    stacks
+let moveCrates9000 (move: Move) (stacks: char list array) =
 
-let moveCrates (move: Move) (stacks: char list array) =
+    let moveOneCrate (stacks: char list array) =
+        let newStacks = Array.copy stacks
+        let crate = newStacks[move.Src - 1].Head
+        newStacks[move.Dst - 1] <- crate :: stacks[move.Dst - 1]
+        newStacks[move.Src - 1] <- stacks[move.Src - 1].Tail
+        newStacks
+
     let rec loop n s =
         match n with
         | 0 -> s
-        | _ -> loop (n - 1) (moveOneCrate move.Src move.Dst s)
+        | _ -> loop (n - 1) (moveOneCrate s)
 
     loop move.Amount stacks
 
+let moveCrates9001 (move: Move) (stacks: char list array) =
+    let newStacks = Array.copy stacks
+    let crates = List.take move.Amount stacks[move.Src - 1]
+    newStacks[move.Dst - 1] <- List.append crates stacks[move.Dst - 1]
+    newStacks[move.Src - 1] <- List.skip move.Amount stacks[move.Src - 1]
+    newStacks
+
 let part1 =
-    Array.fold (fun move s -> moveCrates s move) initialStacks moves
+    Array.fold (fun move s -> moveCrates9000 s move) initialStacks moves
     |> Array.map List.head
     |> (fun x -> System.String.Concat(x))
 
-let part2 = 0
+let part2 =
+    Array.fold (fun move s -> moveCrates9001 s move) initialStacks moves
+    |> Array.map List.head
+    |> (fun x -> System.String.Concat(x))
 
 printfn "initialStacks: %A" initialStacks
 printfn "Part 1: %A" part1
 printfn "Part 2: %A" part2
-printfn "startLineNum: %A" startLineNum
-printfn "numStacks: %A" numStacks
-//printfn "moves: %A" moves
