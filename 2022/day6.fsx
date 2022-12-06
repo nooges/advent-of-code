@@ -5,8 +5,7 @@ let input = System.IO.File.ReadAllText("data/day6-input.txt")
 
 let findMarker size =
     Seq.windowed size
-    >> Seq.map (Set.ofSeq >> Set.count)
-    >> Seq.findIndex ((=) size)
+    >> Seq.findIndex (Set.ofSeq >> Set.count >> (=) size)
     >> (+) size
 
 let part1 = findMarker 4 input
