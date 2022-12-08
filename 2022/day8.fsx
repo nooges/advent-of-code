@@ -29,8 +29,7 @@ let isVisible x y value =
         | a -> Array.max a < value
 
     lookAround
-    |> Array.map (fun f -> f x y |> isMax)
-    |> Array.contains true
+    |> Array.exists (fun f -> f x y |> isMax)
 
 let countVisible (grid: int [] []) =
     grid
