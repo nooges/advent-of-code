@@ -43,10 +43,9 @@ let countVisible (grid: int [] []) =
 
 let scenicScore x y value =
     let numViewable a =
-        match a with
-        | [||] -> 0
-        | a when Array.max a < value -> a.Length
-        | _ -> (Array.findIndex (fun x -> x >= value) a) + 1
+        match Array.tryFindIndex ((<=) value) a with
+        | None -> a.Length
+        | Some x -> x + 1
 
     lookAround
     |> Array.map (fun f -> f x y |> numViewable)
