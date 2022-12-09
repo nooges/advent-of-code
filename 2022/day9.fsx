@@ -17,7 +17,7 @@ type State =
     { knots: Position []
       pastT: Position Set }
 
-let input = System.IO.File.ReadAllLines("data/day9-sample2.txt")
+let input = System.IO.File.ReadAllLines("data/day9-input.txt")
 
 let parseLine line =
     line
@@ -37,37 +37,23 @@ let moveKnot (k: Position) (dir: Direction) dist =
     | Left -> { k with x = k.x - dist }
     | Right -> { k with x = k.x + dist }
 
-let moveKnotPairOneStep (k: Position) (kn: Position) (dir: Direction) isHead =
-    let k' =
-        match isHead with
-        | true -> moveKnot k dir 1
-        | _ -> k
-
-    let nextKnotTooFar = abs (k'.x - kn.x) > 1 || abs (k'.y - kn.y) > 1
-
-    // TODO: Figure out correct direction to move
-    let d =
-        match (k', kn) with
-        | (k', kn) when k'.x - kn.x > 1 -> Right
-        | (k', kn) when k'.x - kn.x < -1 -> Left
-        | (k', kn) when k'.y - kn.y > 1 -> Up
-        | _ -> Down
-
-    match nextKnotTooFar with
-    | false -> (k', kn)
-    | _ -> (k', moveKnot k' d -1)
+let moveNextKnotOneStep (k: Position) (kn: Position) =
+    match (k.x - kn.x, k.y - kn.y) with
+    | (dx, dy) when abs dx < 2 && abs dy < 2 -> kn
+    | (dx, dy) ->
+        { x = kn.x + System.Math.Clamp(dx, -1, 1)
+          y = kn.y + System.Math.Clamp(dy, -1, 1) }
 
 let moveKnotsOneStep (knots: Position []) dir =
     let ks' = Array.copy knots
+    ks'[0] <- moveKnot knots[0] dir 1
 
     let rec loop n =
         match n with
         | n when n = knots.Length - 1 -> ks'
         | _ ->
-            let (k', kn') = moveKnotPairOneStep ks'[n] ks'[n + 1] dir (n = 0)
-            ks'[n] <- k'
+            let kn' = moveNextKnotOneStep ks'[n] ks'[n + 1]
             ks'[n + 1] <- kn'
-            //(n, ks') |> pp
             loop (n + 1)
 
     loop 0
@@ -78,7 +64,6 @@ let moveRope (state: State) (motion: Motion) =
         | 0 -> s
         | _ ->
             let knots' = moveKnotsOneStep s.knots motion.Direction
-            //knots' |> pp
 
             let s' =
                 { s with
@@ -87,11 +72,7 @@ let moveRope (state: State) (motion: Motion) =
 
             loop s' (step - 1)
 
-    let state' = loop state motion.Steps
-    //"***************" |> pp
-    //Array.last state'.knots |> pp
-    //state'.pastT |> pp
-    state'
+    loop state motion.Steps
 
 let motions = input |> Array.map parseLine
 
