@@ -14,11 +14,10 @@ type Motion = { Direction: Direction; Steps: int }
 type Position = { x: int; y: int }
 
 type State =
-    { h: Position
-      t: Position
-      pastT: Position List }
+    { knots: Position []
+      pastT: Position Set }
 
-let input = System.IO.File.ReadAllLines("data/day9-input.txt")
+let input = System.IO.File.ReadAllLines("data/day9-sample2.txt")
 
 let parseLine line =
     line
@@ -31,49 +30,84 @@ let parseLine line =
         | [| "R"; n |] -> { Direction = Right; Steps = int n }
         | _ -> failwith "Unknown input")
 
-let stepOne (s: State) (dir: Direction) =
-    let h' =
-        match dir with
-        | Up -> { s.h with y = s.h.y + 1 }
-        | Down -> { s.h with y = s.h.y - 1 }
-        | Left -> { s.h with x = s.h.x - 1 }
-        | Right -> { s.h with x = s.h.x + 1 }
+let moveKnot (k: Position) (dir: Direction) dist =
+    match dir with
+    | Up -> { k with y = k.y + dist }
+    | Down -> { k with y = k.y - dist }
+    | Left -> { k with x = k.x - dist }
+    | Right -> { k with x = k.x + dist }
 
-    let tailTooFar = abs (h'.x - s.t.x) > 1 || abs (h'.y - s.t.y) > 1
+let moveKnotPairOneStep (k: Position) (kn: Position) (dir: Direction) isHead =
+    let k' =
+        match isHead with
+        | true -> moveKnot k dir 1
+        | _ -> k
 
-    match tailTooFar with
-    | false -> { s with h = h' }
-    | _ ->
-        let t' =
-            match dir with
-            | Up -> { h' with y = h'.y - 1 }
-            | Down -> { h' with y = h'.y + 1 }
-            | Left -> { h' with x = h'.x + 1 }
-            | Right -> { h' with x = h'.x - 1 }
+    let nextKnotTooFar = abs (k'.x - kn.x) > 1 || abs (k'.y - kn.y) > 1
 
-        { s with
-            h = h'
-            t = t'
-            pastT = t' :: s.pastT }
+    // TODO: Figure out correct direction to move
+    let d =
+        match (k', kn) with
+        | (k', kn) when k'.x - kn.x > 1 -> Right
+        | (k', kn) when k'.x - kn.x < -1 -> Left
+        | (k', kn) when k'.y - kn.y > 1 -> Up
+        | _ -> Down
+
+    match nextKnotTooFar with
+    | false -> (k', kn)
+    | _ -> (k', moveKnot k' d -1)
+
+let moveKnotsOneStep (knots: Position []) dir =
+    let ks' = Array.copy knots
+
+    let rec loop n =
+        match n with
+        | n when n = knots.Length - 1 -> ks'
+        | _ ->
+            let (k', kn') = moveKnotPairOneStep ks'[n] ks'[n + 1] dir (n = 0)
+            ks'[n] <- k'
+            ks'[n + 1] <- kn'
+            //(n, ks') |> pp
+            loop (n + 1)
+
+    loop 0
 
 let moveRope (state: State) (motion: Motion) =
     let rec loop s step =
         match step with
         | 0 -> s
-        | _ -> loop (stepOne s motion.Direction) (step - 1)
+        | _ ->
+            let knots' = moveKnotsOneStep s.knots motion.Direction
+            //knots' |> pp
 
-    loop state motion.Steps
+            let s' =
+                { s with
+                    knots = knots'
+                    pastT = Set.add (Array.last knots') s.pastT }
+
+            loop s' (step - 1)
+
+    let state' = loop state motion.Steps
+    //"***************" |> pp
+    //Array.last state'.knots |> pp
+    //state'.pastT |> pp
+    state'
 
 let motions = input |> Array.map parseLine
 
-let initialState =
-    { h = { x = 0; y = 0 }
-      t = { x = 0; y = 0 }
-      pastT = [ { x = 0; y = 0 } ] }
+let initialState numKnots =
+    { knots = Array.create numKnots { x = 0; y = 0 }
+      pastT = Set.ofList [ { x = 0; y = 0 } ] }
 
 motions
-|> Array.fold moveRope initialState
+|> Array.fold moveRope (initialState 2)
 |> (fun s -> s.pastT)
-|> Set.ofList
 |> Set.count
 |> pp1
+
+motions
+//|> Array.take 2
+|> Array.fold moveRope (initialState 10)
+|> (fun s -> s.pastT)
+|> Set.count
+|> pp2
