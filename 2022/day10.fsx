@@ -13,13 +13,23 @@ let parseLine =
         |> split ' '
         |> (fun x -> [| 0; int (x[1]) |])
 
-
 let registerValues =
     input
     |> Array.collect parseLine
     |> Array.scan (+) 1
 
-[ 20; 60; 100; 140; 180; 220 ]
+let pixel pos reg =
+    match abs (pos - reg) <= 1 with
+    | true -> "#"
+    | _ -> " "
+
+[ 20..40..240 ]
 |> List.map (fun i -> registerValues[i - 1] * i)
 |> List.sum
 |> pp1
+
+[ 0..239 ]
+|> List.map (fun i -> pixel (i % 40) registerValues[i])
+|> List.splitInto 6
+|> List.map (String.concat "")
+|> pp
