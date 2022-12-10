@@ -20,7 +20,7 @@ let registerValues =
 
 let pixel pos reg =
     match abs (pos - reg) <= 1 with
-    | true -> "#"
+    | true -> "█"
     | _ -> " "
 
 [ 20..40..240 ]
