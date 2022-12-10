@@ -28,8 +28,8 @@ let pixel pos reg =
 |> List.sum
 |> pp1
 
-[ 0..239 ]
-|> List.map (fun i -> pixel (i % 40) registerValues[i])
-|> List.chunkBySize 40
-|> List.map (String.concat "")
+registerValues
+|> Array.mapi (fun i v -> pixel (i % 40) v)
+|> Array.chunkBySize 40
+|> Array.map (String.concat "")
 |> pp
