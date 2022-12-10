@@ -30,6 +30,6 @@ let pixel pos reg =
 
 [ 0..239 ]
 |> List.map (fun i -> pixel (i % 40) registerValues[i])
-|> List.splitInto 6
+|> List.chunkBySize 40
 |> List.map (String.concat "")
 |> pp
