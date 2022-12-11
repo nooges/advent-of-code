@@ -4,20 +4,20 @@
 open AOC.Utils
 
 type Monkey =
-    { Items: int list
-      Operation: int -> int
-      Divisor: int
+    { Items: bigint list
+      Operation: bigint -> bigint
+      Divisor: bigint
       NextTrue: int
       NextFalse: int
-      Inspected: int }
+      Inspected: bigint }
 
-let input = System.IO.File.ReadAllText("data/day11-sample.txt")
+let input = System.IO.File.ReadAllText("data/day11-input.txt")
 
 let parseItems =
     withRegex "  Starting items: (.*)"
     >> Array.last
     >> split ','
-    >> Array.map (trim >> int)
+    >> Array.map (trim >> int >> bigint)
     >> Array.toList
 
 let parseOperation line =
@@ -29,8 +29,8 @@ let parseOperation line =
 
     match op with
     | [| "*"; "old" |] -> (fun x -> x * x)
-    | [| "*"; n |] -> (*) (int (n))
-    | [| "+"; n |] -> (+) (int (n))
+    | [| "*"; n |] -> (*) (bigint (int n))
+    | [| "+"; n |] -> (+) (bigint (int n))
     | _ -> failwith "Unknown"
 
 let parseMonkey (m: string) =
@@ -39,12 +39,15 @@ let parseMonkey (m: string) =
 
     { Items = parseItems lines[1]
       Operation = parseOperation lines[2]
-      Divisor = lines[3] |> lastToInt
+      Divisor = lines[3] |> lastToInt |> bigint
       NextTrue = lines[4] |> lastToInt
       NextFalse = lines[5] |> lastToInt
-      Inspected = 0 }
+      Inspected = 0I }
 
 let inspectItem op level = (op level) / 3
+
+let primeDivisor = 2I * 3I * 5I * 7I * 11I * 13I * 17I * 19I * 23I
+let inspectItem2 (op: bigint -> bigint) (level: bigint) = (op level) % primeDivisor
 
 let addMonkeyItems n newItems (state: Monkey []) =
     { state[n] with Items = List.append state[n].Items newItems }
@@ -54,10 +57,10 @@ let processMonkey n (state: Monkey []) =
     let newState = Array.copy state
 
     m.Items
-    |> List.map (inspectItem m.Operation)
+    |> List.map (inspectItem2 m.Operation)
     |> List.map (fun level ->
-        match level % m.Divisor with
-        | 0 -> (level, m.NextTrue)
+        match level % m.Divisor = 0I with
+        | true -> (level, m.NextTrue)
         | _ -> (level, m.NextFalse))
     |> List.groupBy (fun (l, next) -> next)
     |> List.map (fun group -> (fst group, snd group |> List.map fst))
@@ -66,7 +69,7 @@ let processMonkey n (state: Monkey []) =
         newState[next] <- addMonkeyItems next (snd group) state)
 
     newState[n] <- { m with
-        Inspected = m.Inspected + m.Items.Length
+        Inspected = m.Inspected + bigint m.Items.Length
         Items = [] }
 
     newState
