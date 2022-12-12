@@ -3,9 +3,9 @@
 #load "Utils.fs"
 open AOC.Utils
 
-let input = System.IO.File.ReadAllLines("data/day12-input.txt")
+let input = System.IO.File.ReadAllLines("data/day12-sample.txt")
 
-let heightMap =
+let map =
     input
     |> Array.map (replace "S" "a")
     |> Array.map (replace "E" "z")
@@ -19,15 +19,13 @@ let findLetters letter =
             match c = letter with
             | true -> Some { x = col; y = row }
             | _ -> None))
-    |> Array.collect (Array.filter (fun p -> p.IsSome))
-    |> Array.map (fun p -> p.Value)
+    |> Array.collect (Array.choose id)
 
 let endPoint = (findLetters 'E')[0]
-let numRows = heightMap.Length
-let numCols = heightMap[0].Length
+let numRows = map.Length
+let numCols = map[0].Length
 
-let heightDiff a b =
-    heightMap.[b.y].[b.x] - heightMap.[a.y].[a.x]
+let heightDiff a b = map.[b.y].[b.x] - map.[a.y].[a.x]
 
 let possibleMoves p =
     [ { x = p.x + 1; y = p.y }
