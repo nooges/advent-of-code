@@ -3,7 +3,7 @@
 #load "Utils.fs"
 open AOC.Utils
 
-let input = System.IO.File.ReadAllLines("data/day12-sample.txt")
+let input = System.IO.File.ReadAllLines("data/day12-input.txt")
 
 let map =
     input
@@ -37,11 +37,11 @@ let possibleMoves p =
         && p'.x < numCols
         && p'.y >= 0
         && p'.y < numRows
-        && heightDiff p p' <= 1)
+        && heightDiff p' p <= 1)
 
-let fewestSteps start =
+let fewestSteps endPoint startPoints =
     let costs = Array2D.create numRows numCols 10000
-    costs[start.y, start.x] <- 0
+    costs[endPoint.y, endPoint.x] <- 0
 
     let rec traverse p =
         let cost = costs[p.y, p.x]
@@ -54,12 +54,11 @@ let fewestSteps start =
                 traverse m
             | _ -> ())
 
-    traverse start
-    costs[endPoint.y, endPoint.x]
+    traverse endPoint
 
-(findLetters 'S')[0] |> fewestSteps |> pp1
+    startPoints
+    |> Array.map (fun p -> costs[p.y, p.x])
+    |> Array.min
 
-findLetters 'a'
-|> Array.map fewestSteps
-|> Array.min
-|> pp2
+fewestSteps endPoint (findLetters 'S') |> pp1
+fewestSteps endPoint (findLetters 'a') |> pp2
