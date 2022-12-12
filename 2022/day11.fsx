@@ -9,7 +9,7 @@ type Monkey =
       Divisor: int64
       NextTrue: int
       NextFalse: int
-      Inspected: int64 }
+      Inspected: int }
 
 let input = System.IO.File.ReadAllText("data/day11-input.txt")
 
@@ -42,69 +42,65 @@ let parseMonkey (m: string) =
       Divisor = lines[3] |> lastToInt |> int64
       NextTrue = lines[4] |> lastToInt
       NextFalse = lines[5] |> lastToInt
-      Inspected = 0L }
+      Inspected = 0 }
+
+let monkeys =
+    input
+    |> (fun x -> x.Split "\n\n")
+    |> Array.map parseMonkey
+
+let modulus =
+    monkeys
+    |> Array.map (fun m -> m.Divisor)
+    |> Array.reduce (*)
 
 let inspectItem op level = (op level) / 3
 
-let primeDivisor = 2L * 3L * 5L * 7L * 11L * 13L * 17L * 19L * 23L
-let inspectItem2 op level = (op level) % primeDivisor
+let inspectItem2 op level = (op level) % modulus
 
-let addMonkeyItems n newItems (state: Monkey []) =
-    { state[n] with Items = List.append state[n].Items newItems }
+let processMonkey (items: int64 list array) n =
+    items[n]
+    |> List.map (inspectItem2 monkeys[n].Operation)
+    |> List.iter (fun level ->
+        let next =
+            match level % monkeys[n].Divisor = 0L with
+            | true -> monkeys[n].NextTrue
+            | _ -> monkeys[n].NextFalse
 
-let processMonkey n (state: Monkey []) =
-    let m = state[n]
-    let newState = Array.copy state
+        items[next] <- items[next] @ [ level ])
 
-    m.Items
-    |> List.map (inspectItem2 m.Operation)
-    |> List.map (fun level ->
-        match level % m.Divisor = 0L with
-        | true -> (level, m.NextTrue)
-        | _ -> (level, m.NextFalse))
-    |> List.groupBy (fun (l, next) -> next)
-    |> List.map (fun group -> (fst group, snd group |> List.map fst))
-    |> List.iter (fun group ->
-        let next = fst group
-        newState[next] <- addMonkeyItems next (snd group) state)
+    monkeys[n] <- { monkeys[n] with Inspected = monkeys[n].Inspected + items[n].Length }
+    items[n] <- []
+    items
 
-    newState[n] <- { m with
-        Inspected = m.Inspected + int64 m.Items.Length
-        Items = [] }
+let processRound (items: int64 list array) =
+    (items, [ 0 .. monkeys.Length - 1 ])
+    ||> List.fold processMonkey
 
-    newState
-
-let processRound (state: Monkey []) =
-    let rec loop acc n =
-        match n with
-        | n when n = state.Length -> acc
-        | _ -> loop (processMonkey n acc) (n + 1)
-
-    loop state 0
-
-let runRounds numRounds (state: Monkey []) =
+let runRounds numRounds (items: int64 list array) =
     let rec loop acc n =
         match n with
         | n when n = numRounds -> acc
         | _ -> loop (processRound acc) (n + 1)
 
-    loop state 0
+    loop items 0
 
-let initialState =
-    input
-    |> (fun x -> x.Split "\n\n")
-    |> Array.map parseMonkey
+let initialItems = monkeys |> Array.map (fun m -> m.Items)
 
-runRounds 20 initialState
+(*
+runRounds 20 initialItems
 |> Array.map (fun m -> m.Inspected)
 |> Array.sortDescending
 |> Array.take 2
 |> Array.reduce (*)
 |> pp1
+*)
 
 
-runRounds 10000 initialState
-|> Array.map (fun m -> m.Inspected)
+runRounds 10000 initialItems
+
+monkeys
+|> Array.map (fun m -> int64 m.Inspected)
 |> Array.sortDescending
 |> Array.take 2
 |> Array.reduce (*)
