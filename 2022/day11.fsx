@@ -21,13 +21,11 @@ let parseItems =
     >> Array.toList
 
 let parseOperation line =
-    let op =
-        line
-        |> withRegex "  Operation: new = old (.*)"
-        |> Array.last
-        |> split ' '
-
-    match op with
+    match line
+          |> withRegex "  Operation: new = old (.*)"
+          |> Array.last
+          |> split ' '
+        with
     | [| "*"; "old" |] -> (fun x -> x * x)
     | [| "*"; n |] -> (*) (int64 n)
     | [| "+"; n |] -> (+) (int64 n)
@@ -54,54 +52,52 @@ let modulus =
     |> Array.map (fun m -> m.Divisor)
     |> Array.reduce (*)
 
-let inspectItem op level = (op level) / 3
+let worryAdjustment1 = (fun n -> n / 3L)
+let worryAdjustment2 = (fun n -> n % modulus)
 
-let inspectItem2 op level = (op level) % modulus
-
-let processMonkey (items: int64 list array) n =
+let processMonkey worryAdjustment (items: int64 list array) n =
     items[n]
-    |> List.map (inspectItem2 monkeys[n].Operation)
     |> List.iter (fun level ->
+        let level' = level |> monkeys[n].Operation |> worryAdjustment
+
         let next =
-            match level % monkeys[n].Divisor = 0L with
+            match level' % monkeys[n].Divisor = 0L with
             | true -> monkeys[n].NextTrue
             | _ -> monkeys[n].NextFalse
 
-        items[next] <- items[next] @ [ level ])
+        items[next] <- items[next] @ [ level' ])
 
     monkeys[n] <- { monkeys[n] with Inspected = monkeys[n].Inspected + items[n].Length }
     items[n] <- []
     items
 
-let processRound (items: int64 list array) =
+let processRound worryAdjustment (items: int64 list array) =
     (items, [ 0 .. monkeys.Length - 1 ])
-    ||> List.fold processMonkey
+    ||> List.fold (processMonkey worryAdjustment)
 
-let runRounds numRounds (items: int64 list array) =
+let runRounds numRounds worryAdjustment (items: int64 list array) =
     let rec loop acc n =
         match n with
         | n when n = numRounds -> acc
-        | _ -> loop (processRound acc) (n + 1)
+        | _ -> loop (processRound worryAdjustment acc) (n + 1)
 
     loop items 0
 
-let initialItems = monkeys |> Array.map (fun m -> m.Items)
+let initialItems ms = ms |> Array.map (fun m -> m.Items)
 
-(*
-runRounds 20 initialItems
-|> Array.map (fun m -> m.Inspected)
-|> Array.sortDescending
-|> Array.take 2
-|> Array.reduce (*)
-|> pp1
-*)
+let monkeyBusiness =
+    Array.map (fun m -> int64 m.Inspected)
+    >> Array.sortDescending
+    >> Array.take 2
+    >> Array.reduce (*)
 
+runRounds 20 worryAdjustment1 (initialItems monkeys)
 
-runRounds 10000 initialItems
+monkeyBusiness monkeys |> pp1
 
 monkeys
-|> Array.map (fun m -> int64 m.Inspected)
-|> Array.sortDescending
-|> Array.take 2
-|> Array.reduce (*)
-|> pp2
+|> Array.iteri (fun i m -> monkeys[i] <- { m with Inspected = 0 })
+
+runRounds 10000 worryAdjustment2 (initialItems monkeys)
+
+monkeyBusiness monkeys |> pp2
