@@ -71,10 +71,12 @@ let fewestSteps start =
                 traverse m
             | _ -> ())
 
-    traverse startPoint
-    visited |> pp
+    traverse start
     visited[endPoint.y, endPoint.x]
 
 fewestSteps startPoint |> pp1
 
-//findLetters 'a' |> Array.map fewestSteps |> pp
+findLetters 'a'
+|> Array.map fewestSteps
+|> Array.min
+|> pp2
