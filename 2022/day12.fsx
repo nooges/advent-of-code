@@ -23,13 +23,21 @@ let findLetter c =
 
     { x = col; y = row }
 
+let findLetters letter =
+    input
+    |> Array.mapi (fun row s ->
+        s.ToCharArray()
+        |> Array.mapi (fun col c ->
+            match c = letter with
+            | true -> Some { x = col; y = row }
+            | _ -> None))
+    |> Array.collect (Array.filter (fun p -> p.IsSome))
+    |> Array.map (fun p -> p.Value)
+
 let startPoint = findLetter 'S'
 let endPoint = findLetter 'E'
 let numRows = heightMap.Length
 let numCols = heightMap[0].Length
-
-let visited = Array2D.create numRows numCols 10000
-visited[startPoint.y, startPoint.x] <- 0
 
 heightMap |> pp
 
@@ -48,19 +56,25 @@ let possibleMoves p =
         && p'.y < numRows
         && heightDiff p p' <= 1)
 
-let rec traverse p =
-    let cost = visited[p.y, p.x]
+let fewestSteps start =
+    let visited = Array2D.create numRows numCols 10000
+    visited[start.y, start.x] <- 0
 
-    possibleMoves p
-    |> List.iter (fun m ->
-        match visited[m.y, m.x] > (cost + 1) with
-        | true ->
-            visited[m.y, m.x] <- cost + 1
-            traverse m
-        | _ -> ())
+    let rec traverse p =
+        let cost = visited[p.y, p.x]
 
-traverse startPoint
+        possibleMoves p
+        |> List.iter (fun m ->
+            match visited[m.y, m.x] > (cost + 1) with
+            | true ->
+                visited[m.y, m.x] <- cost + 1
+                traverse m
+            | _ -> ())
 
-visited |> pp
+    traverse startPoint
+    visited |> pp
+    visited[endPoint.y, endPoint.x]
 
-visited[endPoint.y, endPoint.x] |> pp1
+fewestSteps startPoint |> pp1
+
+//findLetters 'a' |> Array.map fewestSteps |> pp
