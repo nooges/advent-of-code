@@ -28,20 +28,24 @@ let drawLine (grid: char [] []) (pair: int [] * int []) =
         |> List.iter (fun n -> grid.[a[1]][n] <- '█')
     | _ -> ()
 
-let maxDepth = 200
+let maxGridDepth = 200
+let maxGridWidth = 800
 
 let drawRocks =
-    //let grid = Array2D.create 800 200 ' '
-    let grid = Array.init (maxDepth + 1) (fun _ -> Array.create 800 ' ')
+    let grid = Array.init (maxGridDepth + 1) (fun _ -> Array.create maxGridWidth ' ')
 
     paths
     |> Array.iter (fun x -> Array.pairwise x |> Array.iter (drawLine grid))
 
     grid
 
-let moveGrain (grid: char [] []) x y =
-    (x, y) |> pp
+let maxDepth =
+    drawRocks
+    |> Array.map (System.String)
+    |> Array.findIndexBack (contains '█')
+    |> (+) 2
 
+let moveGrain (grid: char [] []) x y =
     if grid.[y + 1][x] = ' ' then
         Some(x, y + 1)
     elif grid.[y + 1][x - 1] = ' ' then
@@ -57,30 +61,31 @@ let dropGrain (grid: char [] []) =
         | None ->
             grid.[y][x] <- 'o'
             (x, y)
-        | Some (a, b) when b = maxDepth -> (a, b)
+        | Some (a, b) when b = maxGridDepth -> (a, b)
         | Some (a, b) -> loop a b
 
     loop 500 0
 
 let dropSand (grid: char [] []) =
     let rec loop n =
-        n |> pp
-
         match dropGrain grid with
-        | (_, y) when y = maxDepth -> n
+        | (_, y) when y = maxGridDepth -> n
         | _ -> loop (n + 1)
 
     loop 0
 
-// Run dropGrain until grid stays the same
+let dropMoreSandUntilBlocked (grid: char [] []) =
+    grid.[maxDepth] <- Array.create maxGridWidth '█'
 
-paths |> pp
+    let rec loop n =
+        match dropGrain grid with
+        | (_, y) when y = 0 -> n + 1
+        | _ -> loop (n + 1)
 
-drawRocks
-|> Array.map (System.String)
-//|> Array.skip 490
-|> pp
+    loop 0
 
-dropSand drawRocks |> pp
+let part1 = dropSand drawRocks
+part1 |> pp1
 
-//drawRocks |> Array.map System.String |> pp
+let part2 = part1 + dropMoreSandUntilBlocked drawRocks
+part2 |> pp2
