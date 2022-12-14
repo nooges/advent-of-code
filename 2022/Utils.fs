@@ -6,6 +6,7 @@ open System.Text.RegularExpressions
 module Utils =
 
     let split c (s: string) = s.Split([| c |])
+    let splitStr (c: string) (s: string) = s.Split(c)
     let contains (c: char) (s: string) = s.Contains(c)
     let trim (s: string) = s.Trim()
     let replace (a: string) (b: string) (s: string) = s.Replace(a, b)
