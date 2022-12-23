@@ -3,6 +3,7 @@ namespace AOC
 open System
 open System.Diagnostics
 open System.Text.RegularExpressions
+open System.Collections.Generic
 
 module Utils =
 
@@ -12,8 +13,8 @@ module Utils =
     let trim (s: string) = s.Trim()
     let replace (a: string) (b: string) (s: string) = s.Replace(a, b)
     let asCharArray (s: string) = s.ToCharArray()
-    let asStringArray: string [] -> string [] = Array.map string
-    let asIntArray: string [] -> int [] = Array.map int
+    let asStringArray: string[] -> string[] = Array.map string
+    let asIntArray: string[] -> int[] = Array.map int
     let charToInt (c: char) = int (c) - int 'a'
     let pp a = printfn "%A" a
 
@@ -26,8 +27,12 @@ module Utils =
     let ps s = printfn "%A" (s |> Seq.toArray)
 
     let withRegex regex str =
-        [| for m in Regex.Match(str, regex).Groups -> m.Value |]
+        [| for m in Regex.Match(str, regex).Groups -> m.Value |] |> Array.tail
+
+    let allInts str =
+        [| for m in Regex.Match(str, """-?\d+""").Groups -> m.Value |]
         |> Array.tail
+        |> Array.map int
 
     type Point = { x: int; y: int }
 
@@ -43,3 +48,16 @@ module Utils =
 
         { millisecondsTaken = timer.ElapsedMilliseconds
           returnedValue = returnValue }
+
+    let memoize f =
+        let dict = Dictionary<_, _>()
+
+        fun c ->
+            let exist, value = dict.TryGetValue c
+
+            match exist with
+            | true -> value
+            | _ ->
+                let value = f c
+                dict.Add(c, value)
+                value
