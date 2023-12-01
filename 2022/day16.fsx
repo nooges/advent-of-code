@@ -46,7 +46,7 @@ let unopenedValves =
 
 unopenedValves |> pp
 
-let endtime = 30
+let endtime = 26
 
 let rec traverse n (state: State) (valve: string) openValve =
     let info = valvesDict[valve]
@@ -65,7 +65,7 @@ let rec traverse n (state: State) (valve: string) openValve =
 
             let pathItem =
                 match state.Unopened.Contains valve with
-                | _ when openValve -> valve + "*"
+                | _ when openValve -> valve + "-"
                 | _ -> valve
 
             { state with
@@ -78,7 +78,7 @@ let rec traverse n (state: State) (valve: string) openValve =
     // Check if valve is in path, if so, check if last rate change is greater than last appearance of valve in path
     let loopFound =
         List.contains valve state.Path
-        && state.LastRateChange > 4
+        && state.LastRateChange > 7
         && (List.findIndex (fun v -> v = valve) state.Path < state.LastRateChange)
 
     match n with
@@ -102,6 +102,91 @@ let rec traverse n (state: State) (valve: string) openValve =
             | _ -> tunnelMax
 
 
+let rec traverse2 n (state: State) (v1: string) (v2: string) o1 o2 =
+    let info1 = valvesDict[v1]
+    let info2 = valvesDict[v2]
+
+    let nextState =
+        match (o1, o2) with
+        | (true, true) ->
+            { state with
+                Pressure = state.Pressure + state.Rate
+                Rate = state.Rate + info1.FlowRate + info2.FlowRate
+                LastRateChange = 0
+                Path = v2 + "*" + v1 + "*" :: state.Path
+                Rates = state.Rate :: state.Rates
+                Unopened = state.Unopened.Remove(v1).Remove(v2) }
+        | (true, false) ->
+            { state with
+                Pressure = state.Pressure + state.Rate
+                Rate = state.Rate + info1.FlowRate
+                LastRateChange = 0
+                Path = v2 + v1 + "*" :: state.Path
+                Rates = state.Rate :: state.Rates
+                Unopened = state.Unopened.Remove(v1) }
+        | (false, true) ->
+            { state with
+                Pressure = state.Pressure + state.Rate
+                Rate = state.Rate + info2.FlowRate
+                LastRateChange = 0
+                Path = v2 + "*" + v1 :: state.Path
+                Rates = state.Rate :: state.Rates
+                Unopened = state.Unopened.Remove(v2) }
+        | _ ->
+
+            let pathItem1 =
+                match state.Unopened.Contains v1 with
+                | _ when o1 -> v1 + "*"
+                | _ -> v1
+
+            let pathItem2 =
+                match state.Unopened.Contains v2 with
+                | _ when o2 -> v2 + "*"
+                | _ -> v2
+
+            { state with
+                Pressure = state.Pressure + state.Rate
+                LastRateChange = state.LastRateChange + 1
+                Path = pathItem2 + pathItem1 :: state.Path
+                Rates = state.Rate :: state.Rates }
+
+    // Detect loop w/o rate change
+    // Check if valve is in path, if so, check if last rate change is greater than last appearance of valve in path
+    let loopFound =
+        (List.contains v1 state.Path
+         && state.LastRateChange > 3
+         && (List.findIndex (fun v -> v = v1) state.Path < state.LastRateChange))
+        || (List.contains v2 state.Path
+            && state.LastRateChange > 3
+            && (List.findIndex (fun v -> v = v2) state.Path < state.LastRateChange))
+
+    match n with
+    | n when n = endtime -> nextState
+    | _ when loopFound -> nextState
+    | _ when nextState.Unopened.IsEmpty -> { nextState with Pressure = state.Pressure + (endtime - n) * state.Rate }
+    | _ ->
+        let tunnelMax =
+            valvesDict[v1].Tunnels
+            |> Array.map (fun v ->
+                valvesDict[v2].Tunnels
+                |> Array.map (fun w -> traverse2 (n + 1) nextState v w false false)
+                |> Array.maxBy (fun v -> v.Pressure))
+            |> Array.maxBy (fun v -> v.Pressure)
+        // if valve is unopened, add option for traverse
+        let openStuff = [| tunnelMax |]
+
+        if nextState.Unopened.Contains v1 then
+            Array.append [| traverse2 (n + 1) nextState v1 |]
+
+        match nextState.Unopened.Contains v1 with
+        | false -> tunnelMax
+        | _ ->
+            let openValveTunnelState = (traverse2 (n + 1) nextState valve true)
+
+            match tunnelMax.Pressure < openValveTunnelState.Pressure with
+            | true -> openValveTunnelState
+            | _ -> tunnelMax
+
 let initialState =
     { Pressure = 0
       Rate = 0
@@ -112,3 +197,22 @@ let initialState =
 
 timeOperation (fun () -> traverse 0 initialState "AA" false)
 |> pp
+
+let initialState2 =
+    { Pressure = 0
+      Rate = 0
+      Unopened =
+        set [ "CE"
+              "GV"
+              "OU"
+              "RG"
+              "TM"
+              "UO"
+              "XG"
+              "ZB" ]
+      LastRateChange = 0
+      Path = []
+      Rates = [] }
+
+//timeOperation (fun () -> traverse 0 initialState2 "AA" false)
+//|> pp

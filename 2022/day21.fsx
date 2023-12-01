@@ -11,7 +11,7 @@ type Job =
 
 type Monkey = { Name: string; Value: Job }
 
-let input = System.IO.File.ReadAllLines("data/day21-input.txt")
+let input = System.IO.File.ReadAllLines("data/day21-sample.txt")
 
 let isAllDigits (s: string) =
     s |> Seq.forall (fun c -> System.Char.IsDigit(c))
@@ -39,17 +39,7 @@ let evaluate (s: string) =
     | "/" -> int64 x[0] / int64 x[2]
     | _ -> failwith "Unknown operator"
 
-let monkeyEquations = new Dictionary<string, string>()
-let monkeyValues = new Dictionary<string, int64>()
-
-input
-|> Array.map parseLine
-|> Array.iter (fun m ->
-    match m.Value with
-    | Number n -> monkeyValues.Add(m.Name, n)
-    | Equation eq -> monkeyEquations.Add(m.Name, eq))
-
-let substituteValues () =
+let substituteValues (monkeyEquations: Dictionary<string, string>) (monkeyValues: Dictionary<string, int64>) =
     monkeyEquations
     |> Seq.iter (fun (KeyValue(name, eq)) ->
         let mutable eq' = eq
@@ -61,7 +51,7 @@ let substituteValues () =
 
         monkeyEquations[name] <- eq')
 
-let evaluateJobs () =
+let evaluateJobs (monkeyEquations: Dictionary<string, string>) (monkeyValues: Dictionary<string, int64>) =
     monkeyEquations
     |> Seq.iter (fun (KeyValue(name, eq)) ->
         if canEvaluate eq then
@@ -69,15 +59,56 @@ let evaluateJobs () =
             let _ = monkeyEquations.Remove name
             ())
 
-let rec loop n =
-    printfn "%d: %d" n monkeyEquations.Count
+let part1 () =
 
-    match monkeyEquations.Count with
-    //| 0 -> monkeyValues["root"]
-    | _ when monkeyValues.ContainsKey "root" -> monkeyValues["root"]
-    | _ ->
-        substituteValues ()
-        evaluateJobs ()
-        loop (n + 1)
+    let monkeyEquations = new Dictionary<string, string>()
+    let monkeyValues = new Dictionary<string, int64>()
 
-timeOperation (fun () -> loop 1) |> pp1
+    input
+    |> Array.map parseLine
+    |> Array.iter (fun m ->
+        match m.Value with
+        | Number n -> monkeyValues.Add(m.Name, n)
+        | Equation eq -> monkeyEquations.Add(m.Name, eq))
+
+    let rec loop n =
+        printfn "%d: %d" n monkeyEquations.Count
+
+        match monkeyEquations.Count with
+        | 0 -> monkeyValues["root"]
+        //| _ when monkeyValues.ContainsKey "root" -> monkeyValues["root"]
+        | _ ->
+            substituteValues monkeyEquations monkeyValues
+            evaluateJobs monkeyEquations monkeyValues
+            loop (n + 1)
+
+    loop 1
+
+timeOperation part1 |> pp1
+
+let part2 () =
+
+    let monkeyEquations = new Dictionary<string, string>()
+    let monkeyValues = new Dictionary<string, int64>()
+
+    input
+    |> Array.map parseLine
+    |> Array.iter (fun m ->
+        match m.Value with
+        | Number n -> monkeyValues.Add(m.Name, n)
+        | Equation eq -> monkeyEquations.Add(m.Name, eq))
+
+    let rec loop n =
+        printfn "%d: %d" n monkeyEquations.Count
+
+        match monkeyEquations.Count with
+        | 0 -> monkeyValues["root"]
+        //| _ when monkeyValues.ContainsKey "root" -> monkeyValues["root"]
+        | _ ->
+            substituteValues monkeyEquations monkeyValues
+            evaluateJobs monkeyEquations monkeyValues
+            loop (n + 1)
+
+    loop 1
+
+timeOperation part2 |> pp1

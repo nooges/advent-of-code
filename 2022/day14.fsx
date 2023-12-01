@@ -87,5 +87,16 @@ let dropMoreSandUntilBlocked (grid: char [] []) =
 let part1 = dropSand drawRocks
 part1 |> pp1
 
-let part2 = part1 + dropMoreSandUntilBlocked drawRocks
-part2 |> pp2
+timeOperation (fun () -> dropMoreSandUntilBlocked drawRocks)
+|> pp
+//let part2 = part1 + dropMoreSandUntilBlocked drawRocks
+//part2 |> pp2
+
+(*
+
+drawRocks
+|> Array.map System.String
+|> (fun s -> System.String.Join("\n", s))
+|> pp
+
+*)
