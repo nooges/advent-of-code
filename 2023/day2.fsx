@@ -17,7 +17,7 @@ let parseCubeSet =
     >> split ','
     >> Array.map (trim >> split ' ' >> (fun p -> (int p[0], p[1])))
 
-let parseGame =
+let isGamePossible =
     split ':'
     >> Array.last
     >> split ';'
@@ -25,10 +25,21 @@ let parseGame =
 
 input
 |> Array.mapi (fun i s ->
-    let res = s |> parseGame
-
-    match res with
+    match (s |> isGamePossible) with
     | true -> i + 1
     | _ -> 0)
 |> Array.sum
 |> pp1
+
+// Part 2
+let gamePowerSet =
+    split ':'
+    >> Array.last
+    >> split ';'
+    >> Array.map (parseCubeSet)
+    >> Array.concat
+    >> Array.groupBy snd
+    >> Array.map (snd >> Array.maxBy fst >> fst)
+    >> Array.fold (*) 1
+
+input |> Array.map gamePowerSet |> Array.sum |> pp2
