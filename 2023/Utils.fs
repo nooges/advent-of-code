@@ -13,8 +13,8 @@ module Utils =
     let trim (s: string) = s.Trim()
     let replace (a: string) (b: string) (s: string) = s.Replace(a, b)
     let asCharArray (s: string) = s.ToCharArray()
-    let asStringArray: string [] -> string [] = Array.map string
-    let asIntArray: string [] -> int [] = Array.map int
+    let asStringArray: string[] -> string[] = Array.map string
+    let asIntArray: string[] -> int[] = Array.map int
     let charToInt (c: char) = int (c) - int 'a'
     let charDigitToInt (c: char) = int (c) - int '0'
     let pp a = printfn "%A" a
@@ -28,13 +28,22 @@ module Utils =
     let ps s = printfn "%A" (s |> Seq.toArray)
 
     let withRegex regex str =
-        [| for m in Regex.Match(str, regex).Groups -> m.Value |]
-        |> Array.tail
+        [| for m in Regex.Match(str, regex).Groups -> m.Value |] |> Array.tail
 
     let allInts str =
-        [| for m in Regex.Match(str, """-?\d+""").Groups -> m.Value |]
+        [| for m in Regex.Match(str, @"-?\d+").Groups -> m.Value |]
         |> Array.tail
         |> Array.map int
+
+    let extractInts (input: string) =
+        let pattern = @"-?\d+"
+        let regex = new Regex(pattern)
+        let matches = regex.Matches(input)
+
+        [| for m in matches do
+               yield m.Value |]
+
+    let isBetween lower upper n = n >= lower && n <= upper
 
     type Point = { x: int; y: int }
 
