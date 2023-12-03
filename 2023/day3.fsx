@@ -45,8 +45,14 @@ let isPartNumber (numberLocation: string * Point) =
     symbolLocations |> Array.map (fun sym -> snd sym |> isNear) |> Array.exists id
 
 let numberLocations =
-    input
-    |> Array.mapi (fun i s -> findNumberLocations i s |> List.filter isPartNumber)
-    |> List.concat
-    |> List.sumBy (fun n -> fst n |> int)
-    |> pp1
+    input |> Array.mapi (fun i s -> findNumberLocations i s) |> List.concat
+
+numberLocations
+|> List.filter isPartNumber
+|> List.sumBy (fun n -> fst n |> int)
+|> pp1
+
+// Part 2
+//let isNearTwoNumers
+
+//symbolLocations |> Array.filter (fun s -> fst s = '*') |> Array.map snd |> pp
