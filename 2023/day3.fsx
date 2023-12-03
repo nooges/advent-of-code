@@ -35,14 +35,15 @@ let findNumberLocations y (s: string) =
 
     loop [] "" 0
 
-let isPartNumber (numberLocation: string * Point) =
+let isNear (numberLocation: string * Point) sp =
     let np = snd numberLocation
     let nlen = (fst numberLocation).Length
+    abs (sp.y - np.y) <= 1 && (isBetween (np.x - 1) (np.x + nlen) sp.x)
 
-    let isNear sp =
-        abs (sp.y - np.y) <= 1 && (isBetween (np.x - 1) (np.x + nlen) sp.x)
-
-    symbolLocations |> Array.map (fun sym -> snd sym |> isNear) |> Array.exists id
+let isPartNumber (numberLocation: string * Point) =
+    symbolLocations
+    |> Array.map (fun sym -> snd sym |> isNear numberLocation)
+    |> Array.exists id
 
 let numberLocations =
     input |> Array.mapi (fun i s -> findNumberLocations i s) |> List.concat
@@ -53,6 +54,15 @@ numberLocations
 |> pp1
 
 // Part 2
-//let isNearTwoNumers
+let gearRatio sp =
+    numberLocations
+    |> List.filter (fun n -> isNear n sp)
+    |> (fun l ->
+        match l.Length with
+        | 2 -> (l.Head |> fst |> int) * (List.last l |> fst |> int)
+        | _ -> 0)
 
-//symbolLocations |> Array.filter (fun s -> fst s = '*') |> Array.map snd |> pp
+symbolLocations
+|> Array.filter (fun s -> fst s = '*')
+|> Array.sumBy (snd >> gearRatio)
+|> pp2
