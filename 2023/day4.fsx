@@ -12,15 +12,20 @@ type Card =
       numbers: int[] }
 
 // Part 1
-let cardValue card =
-    Set.intersect (Set.ofArray card.winners) (Set.ofArray card.numbers)
-    |> (fun s -> 2.0 ** (float (s.Count - 1)) |> int)
+let numMatches card =
+    Set.intersect (Set.ofArray card.winners) (Set.ofArray card.numbers) |> Set.count
 
-input
-|> Array.map (withRegex "Card (.*): (.*) \| (.*)")
-|> Array.sumBy (fun a ->
-    { id = int a[0]
-      winners = extractInts a[1]
-      numbers = extractInts a[2] }
-    |> cardValue)
-|> pp1
+let cardValue = numMatches >> (fun s -> 2.0 ** (float (s - 1)) |> int)
+
+let cards =
+    input
+    |> Array.map (withRegex "Card (.*): (.*) \| (.*)")
+    |> Array.map (fun a ->
+        { id = int a[0]
+          winners = extractInts a[1]
+          numbers = extractInts a[2] })
+
+cards |> Array.sumBy cardValue |> pp1
+
+// Part 2
+cards |> Array.map numMatches |> pp2
