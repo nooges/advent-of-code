@@ -22,8 +22,8 @@ let cards =
     |> Array.map (withRegex "Card (.*): (.*) \| (.*)")
     |> Array.map (fun a ->
         { id = int a[0]
-          winners = extractInts a[1]
-          numbers = extractInts a[2] })
+          winners = allInts a[1]
+          numbers = allInts a[2] })
 
 cards |> Array.sumBy cardValue |> pp1
 

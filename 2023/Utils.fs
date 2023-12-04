@@ -31,17 +31,7 @@ module Utils =
         [| for m in Regex.Match(str, regex).Groups -> m.Value |] |> Array.tail
 
     let allInts str =
-        [| for m in Regex.Match(str, @"-?\d+").Groups -> m.Value |]
-        |> Array.tail
-        |> Array.map int
-
-    let extractInts (input: string) =
-        let pattern = @"-?\d+"
-        let regex = new Regex(pattern)
-        let matches = regex.Matches(input)
-
-        [| for m in matches do
-               yield int m.Value |]
+        [| for m in Regex.Matches(str, @"-?\d+") -> m.Value |> int |]
 
     let isBetween lower upper n = n >= lower && n <= upper
 
