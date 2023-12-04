@@ -23,7 +23,7 @@ let findNumberLocations y (s: string) =
     let rec loop acc curr pos =
         match (pos, curr) with
         | (l, "") when l = s.Length -> acc
-        | (l, n) when l = s.Length -> (((string curr, { x = pos - curr.Length; y = y })) :: acc)
+        | (l, _) when l = s.Length -> (((string curr, { x = pos - curr.Length; y = y })) :: acc)
         | (_, "") ->
             match s[pos] with
             | c when System.Char.IsDigit(c) -> loop acc (string c) (pos + 1)
@@ -42,8 +42,8 @@ let isNear (numberLocation: string * Point) sp =
 
 let isPartNumber (numberLocation: string * Point) =
     symbolLocations
-    |> Array.map (fun sym -> snd sym |> isNear numberLocation)
-    |> Array.exists id
+    |> Array.tryFind (fun sym -> snd sym |> isNear numberLocation)
+    |> Option.isSome
 
 let numberLocations =
     input |> Array.mapi (fun i s -> findNumberLocations i s) |> List.concat
