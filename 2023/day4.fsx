@@ -28,4 +28,19 @@ let cards =
 cards |> Array.sumBy cardValue |> pp1
 
 // Part 2
-cards |> Array.map numMatches |> pp2
+let totalCards (matchCounts: int[]) =
+    let rec loop (copies: int[]) n =
+        match n with
+        | n when n = matchCounts.Length -> Array.sum copies
+        | _ ->
+            let m = matchCounts[n]
+            let cardCopies = copies[n]
+
+            let copies' =
+                Array.fold (fun c i -> c |> Array.updateAt i (c[i] + cardCopies)) copies [| (n + 1) .. (n + m) |]
+
+            loop copies' (n + 1)
+
+    loop (Array.create matchCounts.Length 1) 0
+
+cards |> Array.map numMatches |> totalCards |> pp2
