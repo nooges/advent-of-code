@@ -41,7 +41,7 @@ module Utils =
         let matches = regex.Matches(input)
 
         [| for m in matches do
-               yield m.Value |]
+               yield int m.Value |]
 
     let isBetween lower upper n = n >= lower && n <= upper
 
