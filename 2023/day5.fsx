@@ -61,9 +61,15 @@ let reversedMaps =
     |> Array.map (Array.sortBy _.src)
 
 timeOperation (fun () ->
-    Seq.initInfinite (fun n -> n) // Locations
-    |> Seq.mapi (fun i s -> (i, reversedMaps |> Array.fold mapToNewCategory s))
-    |> Seq.filter (snd >> inSeedRange)
-    |> Seq.head
-    |> fst)
+    let findLocation start step =
+        Seq.initInfinite (fun n -> start + int64 n * step) // Locations
+        |> Seq.mapi (fun i s -> (int64 i + start, reversedMaps |> Array.fold mapToNewCategory s))
+        |> Seq.filter (snd >> inSeedRange)
+        |> Seq.head
+        |> fst
+
+    let stepSize = 10000L
+    let estimate = findLocation 0L stepSize
+    estimate * stepSize |> pp
+    findLocation ((estimate - 1L) * stepSize) 1L)
 |> pp2
