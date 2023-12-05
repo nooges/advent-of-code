@@ -41,9 +41,7 @@ let isNear (numberLocation: string * Point) sp =
     abs (sp.y - np.y) <= 1 && (isBetween (np.x - 1) (np.x + nlen) sp.x)
 
 let isPartNumber (numberLocation: string * Point) =
-    symbolLocations
-    |> Array.tryFind (fun sym -> snd sym |> isNear numberLocation)
-    |> Option.isSome
+    symbolLocations |> Array.exists (fun sym -> snd sym |> isNear numberLocation)
 
 let numberLocations =
     input |> Array.mapi (fun i s -> findNumberLocations i s) |> List.concat
