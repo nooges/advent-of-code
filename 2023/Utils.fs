@@ -33,6 +33,9 @@ module Utils =
     let allInts str =
         [| for m in Regex.Matches(str, @"-?\d+") -> m.Value |> int |]
 
+    let allInt64s str =
+        [| for m in Regex.Matches(str, @"-?\d+") -> m.Value |> int64 |]
+
     let isBetween lower upper n = n >= lower && n <= upper
 
     type Point = { x: int; y: int }
