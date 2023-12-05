@@ -68,6 +68,8 @@ timeOperation (fun () ->
         |> Seq.head
         |> fst
 
+    // There's probably a set of inputs possible that would make this estimation trick not work,
+    // like having a range getting chopped up into pieces smaller than the step size
     let stepSize = 10000L
     let estimate = findLocation 0L stepSize
     estimate * stepSize |> pp
