@@ -34,9 +34,7 @@ let mapToNewCategory n ms =
             | _ -> None)
         |> Option.defaultValue n
 
-seeds
-|> Array.map (fun s -> maps |> Array.fold mapToNewCategory s)
-|> Array.min
+timeOperation (fun () -> seeds |> Array.map (fun s -> maps |> Array.fold mapToNewCategory s) |> Array.min)
 |> pp1
 
 // Part 2
@@ -62,9 +60,10 @@ let reversedMaps =
     |> Array.rev
     |> Array.map (Array.sortBy _.src)
 
-Seq.initInfinite (fun n -> n) // Locations
-|> Seq.mapi (fun i s -> (i, reversedMaps |> Array.fold mapToNewCategory s))
-|> Seq.filter (snd >> inSeedRange)
-|> Seq.head
-|> fst
+timeOperation (fun () ->
+    Seq.initInfinite (fun n -> n) // Locations
+    |> Seq.mapi (fun i s -> (i, reversedMaps |> Array.fold mapToNewCategory s))
+    |> Seq.filter (snd >> inSeedRange)
+    |> Seq.head
+    |> fst)
 |> pp2
