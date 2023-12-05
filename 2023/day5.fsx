@@ -11,8 +11,6 @@ let seeds = dataGroups[0] |> allInt64s
 
 type categoryMapRange = { dst: int64; src: int64; len: int64 }
 
-type categoryMaps = categoryMapRange[]
-
 let parseCategoryMap =
     split '\n'
     >> Array.tail
