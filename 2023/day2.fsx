@@ -40,6 +40,6 @@ let gamePowerSet =
     >> Array.concat
     >> Array.groupBy snd
     >> Array.map (snd >> Array.maxBy fst >> fst)
-    >> Array.fold (*) 1
+    >> Array.reduce (*)
 
 input |> Array.map gamePowerSet |> Array.sum |> pp2
