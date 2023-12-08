@@ -30,10 +30,10 @@ timeOperation (fun () -> traverse (fun n -> n = "ZZZ") "AAA") |> pp1
 
 // Part 2
 let rec gcd a b =
-    match (a, b) with
-    | (x, y) when y = 0I -> x
-    | (x, y) when x = 0I -> y
-    | (a, b) -> gcd b (a % b)
+    match () with
+    | _ when b = 0I -> a
+    | _ when a = 0I -> b
+    | _ -> gcd b (a % b)
 
 let lcm a b = a * b / (gcd a b)
 
