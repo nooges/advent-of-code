@@ -40,18 +40,16 @@ module Utils =
 
     type Point = { x: int; y: int }
 
-    type TimedOperation<'T> =
-        { millisecondsTaken: int64
-          returnedValue: 'T }
+    type TimedOperation<'T> = { ms: float; result: 'T }
 
     let timeOperation<'T> (func: unit -> 'T) : TimedOperation<'T> =
         let timer = new Stopwatch()
         timer.Start()
-        let returnValue = func ()
+        let result = func ()
         timer.Stop()
 
-        { millisecondsTaken = timer.ElapsedMilliseconds
-          returnedValue = returnValue }
+        { ms = (float timer.ElapsedTicks) / (float Stopwatch.Frequency) * 1000.
+          result = result }
 
     let memoize f =
         let dict = Dictionary<_, _>()
