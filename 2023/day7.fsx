@@ -76,8 +76,8 @@ let calculateJokerType (cards: string) =
     | (_, 1) -> counts |> Array.map snd
     | _ ->
         let (jokerCount, otherCounts) = counts |> Array.partition (fst >> (=) 'J')
-        let c = otherCounts |> Array.map snd
-        c |> Array.updateAt 0 (snd jokerCount[0] + c[0])
+        let highestCount = snd otherCounts[0] + snd jokerCount[0]
+        otherCounts |> Array.map snd |> Array.updateAt 0 highestCount
     |> countsToType
 
 let readJokerHand (s: string) =
