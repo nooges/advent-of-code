@@ -20,26 +20,31 @@ type Hand =
       handType: Type
       bid: int }
 
-let calculateType (cards: string) =
-    let counts = cards |> asCharArray |> Array.countBy id |> Array.map snd |> Array.sort
-
-    match counts with
+let countsToType =
+    function
     | [| 5 |] -> Type.FiveOfAKind
-    | [| 1; 4 |] -> Type.FourOfAKind
-    | [| 2; 3 |] -> Type.FullHouse
-    | [| 1; 1; 3 |] -> Type.ThreeOfAKind
-    | [| 1; 2; 2 |] -> Type.TwoPair
-    | [| 1; 1; 1; 2 |] -> Type.OnePair
+    | [| 4; 1 |] -> Type.FourOfAKind
+    | [| 3; 2 |] -> Type.FullHouse
+    | [| 3; 1; 1 |] -> Type.ThreeOfAKind
+    | [| 2; 2; 1 |] -> Type.TwoPair
+    | [| 2; 1; 1; 1 |] -> Type.OnePair
     | _ -> Type.HighCard
 
-let cardStrength (c: char) =
-    match c with
+let calculateType =
+    asCharArray
+    >> Array.countBy id
+    >> Array.map snd
+    >> Array.sortDescending
+    >> countsToType
+
+let cardStrength =
+    function
     | 'A' -> 14
     | 'K' -> 13
     | 'Q' -> 12
     | 'J' -> 11
     | 'T' -> 10
-    | _ -> charDigitToInt c
+    | c -> charDigitToInt c
 
 let readHand (s: string) =
     let parts = s.Split(' ')
@@ -53,6 +58,7 @@ let compareHands (a: Hand) (b: Hand) =
     | res when res <> 0 -> res
     | _ -> Array.compareWith compare a.cards b.cards
 
+// Part 1
 timeOperation (fun () ->
     input
     |> Array.map readHand
@@ -60,3 +66,31 @@ timeOperation (fun () ->
     |> Array.mapi (fun i h -> (i + 1) * h.bid)
     |> Array.sum)
 |> pp1
+
+// Part 2
+let calculateJokerType (cards: string) =
+    let counts = cards |> asCharArray |> Array.countBy id |> Array.sortByDescending snd
+
+    match (counts |> Array.map fst |> Array.contains 'J', counts.Length) with
+    | (false, _)
+    | (_, 1) -> counts |> Array.map snd
+    | _ ->
+        let (jokerCount, otherCounts) = counts |> Array.partition (fst >> (=) 'J')
+        let c = otherCounts |> Array.map snd
+        c |> Array.updateAt 0 (snd jokerCount[0] + c[0])
+    |> countsToType
+
+let readJokerHand (s: string) =
+    let parts = s.Split(' ')
+
+    { cards = parts[0] |> replace "J" "1" |> asCharArray |> Array.map cardStrength
+      handType = calculateJokerType parts[0]
+      bid = int parts[1] }
+
+timeOperation (fun () ->
+    input
+    |> Array.map readJokerHand
+    |> Array.sortWith compareHands
+    |> Array.mapi (fun i h -> (i + 1) * h.bid)
+    |> Array.sum)
+|> pp2
