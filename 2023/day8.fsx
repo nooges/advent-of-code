@@ -29,11 +29,18 @@ let traverse stopCondition start =
 timeOperation (fun () -> traverse (fun n -> n = "ZZZ") "AAA") |> pp1
 
 // Part 2
-// Take the array returned values here and compute LCM of it
+let rec gcd a b =
+    match (a, b) with
+    | (x, y) when y = 0I -> x
+    | (x, y) when x = 0I -> y
+    | (a, b) -> gcd b (a % b)
+
+let lcm a b = a * b / (gcd a b)
+
 timeOperation (fun () ->
     nodes
     |> Map.keys
     |> Seq.filter (fun n -> n[2] = 'A')
-    |> Seq.map (traverse (fun n -> n[2] = 'Z'))
-    |> Seq.toArray)
+    |> Seq.map (traverse (fun n -> n[2] = 'Z') >> (fun n -> bigint (int n)))
+    |> Seq.reduce lcm)
 |> pp2
