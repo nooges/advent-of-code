@@ -31,7 +31,11 @@ let traverse stopCondition start =
 timeOperation (fun () -> traverse (fun n -> n = "ZZZ") "AAA") |> pp1
 
 // Part 2
-let startNodes = nodes |> Map.keys |> Seq.filter (fun n -> n[2] = 'A')
 // Take the array returned values here and compute LCM of it
-timeOperation (fun () -> startNodes |> Seq.map (traverse (fun n -> n[2] = 'Z')) |> Seq.toArray)
+timeOperation (fun () ->
+    nodes
+    |> Map.keys
+    |> Seq.filter (fun n -> n[2] = 'A')
+    |> Seq.map (traverse (fun n -> n[2] = 'Z'))
+    |> Seq.toArray)
 |> pp2
