@@ -7,8 +7,6 @@ open System.Text.RegularExpressions
 
 let input = System.IO.File.ReadAllLines("data/day8-input.txt")
 
-type Node = { left: string; right: string }
-
 let moves = input[0] |> asCharArray |> Array.toList
 
 let nodes =
