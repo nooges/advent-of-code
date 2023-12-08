@@ -14,18 +14,24 @@ let moves = input[0] |> asCharArray |> Array.toList
 let nodes =
     input[2..]
     |> Array.map (fun l ->
-        [| for m in Regex.Matches(l, @"-?[A-Z]+") -> m.Value |]
+        [| for m in Regex.Matches(l, @"-?[A-Z12]+") -> m.Value |]
         |> (fun a -> (a[0], Map [ 'L', a[1]; 'R', a[2] ])))
     |> Map.ofArray
 
 // Part 1
-let traverse start =
-    let rec loop i (m: list<char>) node =
-        match (node, m) with
-        | ("ZZZ", _) -> i
-        | (_, []) -> loop i moves node
-        | (_, x :: xs) -> loop (i + 1) xs (nodes[node][x])
+let traverse stopCondition start =
+    let rec loop i m node =
+        match m with
+        | _ when stopCondition node -> i
+        | [] -> loop i moves node
+        | x :: xs -> loop (i + 1) xs (nodes[node][x])
 
     loop 0 moves start
 
-timeOperation (fun () -> traverse "AAA") |> pp1
+timeOperation (fun () -> traverse (fun n -> n = "ZZZ") "AAA") |> pp1
+
+// Part 2
+let startNodes = nodes |> Map.keys |> Seq.filter (fun n -> n[2] = 'A')
+// Take the array returned values here and compute LCM of it
+timeOperation (fun () -> startNodes |> Seq.map (traverse (fun n -> n[2] = 'Z')) |> Seq.toArray)
+|> pp2
