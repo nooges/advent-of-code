@@ -41,6 +41,6 @@ timeOperation (fun () ->
     nodes
     |> Map.keys
     |> Seq.filter (fun n -> n[2] = 'A')
-    |> Seq.map (traverse (fun n -> n[2] = 'Z') >> (fun n -> bigint (int n)))
+    |> Seq.map (traverse (fun n -> n[2] = 'Z') >> bigint)
     |> Seq.reduce lcm)
 |> pp2
