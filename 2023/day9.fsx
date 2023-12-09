@@ -3,22 +3,20 @@
 #load "Utils.fs"
 
 open AOC.Utils
-open System.Text.RegularExpressions
 
 let input = System.IO.File.ReadAllLines("data/day9-input.txt")
 
-let diff l =
-    l |> Array.pairwise |> Array.map (fun (a, b) -> b - a)
+let diff = Array.pairwise >> Array.map (fun (a, b) -> b - a)
 
-let repeatDiff l =
-    let rec loop acc i s =
-        match Array.forall ((=) 0) s with
+let nextValue =
+    let rec loop acc l =
+        match Array.forall ((=) 0) l with
         | true -> acc
-        | _ -> loop (s :: acc) (i + 1) (diff s)
+        | _ -> loop (Array.last l + acc) (diff l)
 
-    loop [] 0 l |> List.sumBy Array.last
+    loop 0
 
-timeOperation (fun () -> input |> Array.sumBy (allInts >> repeatDiff)) |> pp1
+timeOperation (fun () -> input |> Array.sumBy (allInts >> nextValue)) |> pp1
 
-timeOperation (fun () -> input |> Array.sumBy (allInts >> Array.rev >> repeatDiff))
+timeOperation (fun () -> input |> Array.sumBy (allInts >> Array.rev >> nextValue))
 |> pp2
