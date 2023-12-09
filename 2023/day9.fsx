@@ -19,3 +19,6 @@ let repeatDiff l =
     loop [] 0 l |> List.sumBy Array.last
 
 timeOperation (fun () -> input |> Array.sumBy (allInts >> repeatDiff)) |> pp1
+
+timeOperation (fun () -> input |> Array.sumBy (allInts >> Array.rev >> repeatDiff))
+|> pp2
