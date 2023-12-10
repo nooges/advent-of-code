@@ -39,6 +39,7 @@ module Utils =
     let isBetween lower upper n = n >= lower && n <= upper
 
     type Point = { x: int; y: int }
+    type GridPoint = { r: int; c: int }
 
     type TimedOperation<'T> = { ms: float; result: 'T }
 
