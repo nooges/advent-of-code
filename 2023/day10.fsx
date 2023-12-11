@@ -8,8 +8,7 @@ let input = System.IO.File.ReadAllLines("data/day10-input.txt")
 
 // Map of look directions
 let pipePaths =
-    Map
-        [ 'F', [ (0, 1); (1, 0) ]
+    Map [ 'F', [ (0, 1); (1, 0) ]
           'L', [ (0, 1); (-1, 0) ]
           'J', [ (0, -1); (-1, 0) ]
           '7', [ (0, -1); (1, 0) ]
@@ -55,5 +54,30 @@ let firstNextPoint =
     else
         { r = start.r; c = start.c + 1 }
 
-timeOperation (fun () -> traverse [ firstNextPoint; start ] |> List.length |> (fun n -> (n - 1) / 2))
+timeOperation (fun () ->
+    traverse [ firstNextPoint; start ]
+    |> List.length
+    |> (fun n -> (n - 1) / 2))
 |> pp1
+
+let loopPoints = traverse [ firstNextPoint; start ]
+
+// Manually replacing the pipe type for S, even though I could write code to figure it out
+Array2D.set grid startRow startCol '|'
+
+let countEnclosedPoints (row: int) (chars: char array) =
+    let rec loop acc flag col =
+        match col < chars.Length with
+        | false -> acc
+        | _ ->
+            match (loopPoints |> List.contains ({ r = row; c = col }), "F7|".Contains grid[row, col], flag) with
+            | (true, true, _) -> loop acc (not flag) (col + 1)
+            | (false, _, true) -> loop (acc + 1) flag (col + 1)
+            | _ -> loop acc flag (col + 1)
+
+    loop 0 false 0
+
+timeOperation (fun () ->
+    [ 0 .. (grid |> Array2D.length1) - 1 ]
+    |> List.sumBy (fun r -> countEnclosedPoints r grid[r, *]))
+|> pp2
