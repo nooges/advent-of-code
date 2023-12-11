@@ -19,12 +19,12 @@ let emptyCols =
 emptyRows |> pp
 emptyCols |> pp
 
-let distance a b =
+let distance expansion a b =
     let space =
         (emptyRows |> List.filter (isBetween (min a.r b.r) (max a.r b.r)) |> List.length)
         + (emptyCols |> List.filter (isBetween (min a.c b.c) (max a.c b.c)) |> List.length)
 
-    abs (a.r - b.r) + abs (a.c - b.c) + space
+    int64 (abs (a.r - b.r) + abs (a.c - b.c)) + (int64 space * (expansion - 1L))
 
 let galaxies =
     [ 0 .. (grid |> Array2D.length1) - 1 ]
@@ -34,12 +34,13 @@ let galaxies =
         |> List.filter (fun (_, c) -> c = '#'))
     |> List.map fst
 
-let pairDistances points =
+let pairDistances expansion points =
     let rec loop acc l =
         match l with
         | [] -> acc
-        | x :: xs -> loop (acc + (xs |> List.sumBy (distance x))) xs
+        | x :: xs -> loop (acc + (xs |> List.sumBy (distance expansion x))) xs
 
     loop 0 points
 
-timeOperation (fun () -> pairDistances galaxies) |> pp1
+timeOperation (fun () -> pairDistances 2L galaxies) |> pp1
+timeOperation (fun () -> pairDistances 1000000L galaxies) |> pp2
