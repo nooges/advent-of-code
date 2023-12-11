@@ -34,11 +34,9 @@ module Utils =
     let withRegex regex str =
         [| for m in Regex.Match(str, regex).Groups -> m.Value |] |> Array.tail
 
-    let allInts str =
-        [| for m in Regex.Matches(str, @"-?\d+") -> m.Value |> int |]
+    let allInts = Regex(@"-?\d+").Matches >> Seq.map (_.Value >> int) >> Array.ofSeq
 
-    let allInt64s str =
-        [| for m in Regex.Matches(str, @"-?\d+") -> m.Value |> int64 |]
+    let allInt64s = Regex(@"-?\d+").Matches >> Seq.map (_.Value >> int64) >> Array.ofSeq
 
     let isBetween lower upper n = n >= lower && n <= upper
 
