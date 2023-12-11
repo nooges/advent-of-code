@@ -18,6 +18,10 @@ module Utils =
     let charToInt (c: char) = int (c) - int 'a'
     let charDigitToInt (c: char) = int (c) - int '0'
     let pp a = printfn "%A" a
+    // Tee operator
+    let (|>!) x sideEffect =
+        sideEffect x |> ignore
+        x
 
     let pp1 a =
         printfn "Part 1:\n-------\n%A\n-------" a
