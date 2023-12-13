@@ -13,12 +13,7 @@ let reflectionPairs max n =
     |> List.map (fun m -> (n - m - 1, n + m))
     |> List.filter (fun (a, b) -> a >= 0 && b <= max)
 
-let numDifferences a b =
-    (0, a, b)
-    |||> Array.fold2 (fun acc x y ->
-        match x = y with
-        | true -> acc
-        | _ -> acc + 1)
+let numDifferences = Array.fold2 (fun acc x y -> if x = y then acc else acc + 1) 0
 
 let findReflectionValue errors grid =
     let maxRow = Array2D.length1 grid - 1
