@@ -13,10 +13,10 @@ let findReflection grid =
     let maxRow = Array2D.length1 grid - 1
 
     let reflectionRow =
-        [ 0 .. maxRow - 1 ]
+        [ 1..maxRow ]
         |> List.tryFind (fun n ->
-            [ 0..n ]
-            |> List.map (fun m -> (n - m, n + m + 1))
+            [ 0 .. n - 1 ]
+            |> List.map (fun m -> (n - m - 1, n + m))
             |> List.filter (fun (a, b) -> a >= 0 && b <= maxRow)
             |> List.forall (fun (a, b) -> grid[a, *] = grid[b, *]))
 
@@ -24,19 +24,17 @@ let findReflection grid =
     let maxCol = Array2D.length2 grid - 1
 
     let reflectionCol =
-        [ 0 .. maxCol - 1 ]
+        [ 1..maxCol ]
         |> List.tryFind (fun n ->
-            [ 0..n ]
-            |> List.map (fun m -> (n - m, n + m + 1))
+            [ 0 .. n - 1 ]
+            |> List.map (fun m -> (n - m - 1, n + m))
             |> List.filter (fun (a, b) -> a >= 0 && b <= maxCol)
             |> List.forall (fun (a, b) -> grid[*, a] = grid[*, b]))
 
-    (reflectionRow, reflectionCol)
+    (reflectionRow, reflectionCol) |>! pp
 
 timeOperation (fun () ->
     grids
     |> Array.map findReflection
-    |> (fun ps ->
-        100 * (Array.choose fst ps |> Array.map ((+) 1) |> Array.sum)
-        + (Array.choose snd ps |> Array.map ((+) 1) |> Array.sum)))
+    |> (fun ps -> 100 * (Array.choose fst ps |> Array.sum) + (Array.choose snd ps |> Array.sum)))
 |> pp1
