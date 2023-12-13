@@ -5,7 +5,7 @@
 open AOC.Utils
 open System.Collections.Generic
 
-let input = System.IO.File.ReadAllLines("data/day12-input.txt")
+let input = System.IO.File.ReadAllLines("data/day12-sample.txt")
 
 type SpringRecord = { condition: string; groups: int list }
 
@@ -22,34 +22,6 @@ let records =
 
 let cache = System.Collections.Generic.Dictionary<_, _>()
 
-let makePossibleArrangements totalSprings (condition: string) =
-
-
-    // TODO: move acc to outside and with output of loop, map/concat the list to acc
-    // TODO: loop cache args: # possible springs left, remaining string
-    let rec loop acc springs l =
-        let hash = (acc, springs, l)
-
-        let exist, value = cache.TryGetValue hash
-
-        match exist with
-        | true -> value
-        | _ ->
-            let possibleSpringsLeft =
-                l |> List.filter (fun c -> c = '#' || c = '?') |> List.length
-
-            let value =
-                match l with
-                | [] -> [ acc ]
-                | _ when springs + possibleSpringsLeft < totalSprings -> []
-                | '?' :: cs -> loop (acc + ".") springs cs @ loop (acc + "#") (springs + 1) cs
-                | '#' :: cs -> loop (acc + "#") (springs + 1) cs
-                | c :: cs -> loop (acc + ".") springs cs
-
-            cache.Add(hash, value)
-            value
-
-    loop "" 0 (condition.ToCharArray() |> Array.toList)
 
 let conditionGroups (condition: string) =
     let rec loop acc curr l =
@@ -65,23 +37,55 @@ let conditionGroups (condition: string) =
 
     loop [] 0 (condition.ToCharArray() |> Array.rev |> Array.toList)
 
-".??..??...?##." |> makePossibleArrangements 5 |> pp
+let makePossibleArrangements totalSprings groups (condition: string) =
+
+    let rec loop springs (l: string) =
+        let hash = (springs, l)
+
+        let exist, value = cache.TryGetValue hash
+
+        match exist with
+        | true ->
+            //pp ("cache hit", springs, l)
+            value
+        | _ ->
+            //let possibleSpringsLeft =
+            //    l |> asCharArray |> Array.filter (fun c -> c = '#' || c = '?') |> Array.length
+            let value =
+                match l with
+                | "" -> [ "" ]
+                | _ when l.StartsWith("#") ->
+                    loop (springs + 1) l[1..]
+                    |> List.map (fun s -> "#" + s)
+                    |> List.filter (fun s -> conditionGroups s = groups)
+                | _ when l.StartsWith(".") ->
+                    loop springs l[1..]
+                    |> List.map (fun s -> "." + s)
+                    |> List.filter (fun s -> conditionGroups s = groups)
+                | _ ->
+                    (loop (springs + 1) l[1..] |> List.map (fun s -> "#" + s))
+                    @ (loop springs l[1..] |> List.map (fun s -> "." + s))
+                    |> List.filter (fun s -> conditionGroups s = groups)
+
+            cache.Add(hash, value)
+            value
+
+    loop 0 condition
 
 //"...##.....#..#.##.###." |> conditionGroups |> pp
 timeOperation (fun () ->
     records
     |> Array.sumBy (fun r ->
         r.condition
-        |> makePossibleArrangements (r.groups |> List.sum)
-        |> List.map conditionGroups
-        |> List.filter (fun g -> g = r.groups)
+        |> makePossibleArrangements (r.groups |> List.sum) r.groups
         |> List.length))
 |> pp1
 
 records |> pp
 
-let copies = 2
+let copies = 1
 
+(*
 timeOperation (fun () ->
     records
     |> Array.sumBy (fun r ->
@@ -94,3 +98,4 @@ timeOperation (fun () ->
         |> List.length
         |>! pp))
 |> pp2
+*)
