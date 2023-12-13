@@ -8,7 +8,6 @@ let input = System.IO.File.ReadAllText("data/day13-input.txt")
 
 let grids = input |> splitStr "\n\n" |> Array.map (splitStr "\n" >> array2D)
 
-
 let reflectionPairs max n =
     [ 0 .. n - 1 ]
     |> List.map (fun m -> (n - m - 1, n + m))
@@ -22,27 +21,26 @@ let numDifferences a b =
         | _ -> acc + 1)
 
 let findReflectionValue errors grid =
-
-    // Search rows
     let maxRow = Array2D.length1 grid - 1
 
     let reflectionRowSum =
         [ 1..maxRow ]
-        |> List.filter (fun n ->
-            reflectionPairs maxRow n
-            |> List.sumBy (fun (a, b) -> numDifferences grid[a, *] grid[b, *])
-            |> (fun d -> d = errors))
+        |> List.filter (
+            reflectionPairs maxRow
+            >> List.sumBy (fun (a, b) -> numDifferences grid[a, *] grid[b, *])
+            >> (=) errors
+        )
         |> List.sum
 
-    // Search cols
     let maxCol = Array2D.length2 grid - 1
 
     let reflectionColSum =
         [ 1..maxCol ]
-        |> List.filter (fun n ->
-            reflectionPairs maxCol n
-            |> List.sumBy (fun (a, b) -> numDifferences grid[*, a] grid[*, b])
-            |> (fun d -> d = errors))
+        |> List.filter (
+            reflectionPairs maxCol
+            >> List.sumBy (fun (a, b) -> numDifferences grid[*, a] grid[*, b])
+            >> (=) errors
+        )
         |> List.sum
 
     100 * reflectionRowSum + reflectionColSum
