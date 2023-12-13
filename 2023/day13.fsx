@@ -47,5 +47,3 @@ let findReflectionValue errors grid =
 
 timeOperation (fun () -> grids |> Array.sumBy (findReflectionValue 0)) |> pp1
 timeOperation (fun () -> grids |> Array.sumBy (findReflectionValue 1)) |> pp2
-
-let xx = grids[0][1, *]
