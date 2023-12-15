@@ -8,6 +8,7 @@ open System.Collections.Generic
 module Utils =
 
     let split c (s: string) = s.Split([| c |])
+    let splitNoEmpty (c: char) (s: string) = s.Split([| c |], StringSplitOptions.RemoveEmptyEntries)
     let splitStr (c: string) (s: string) = s.Split(c)
     let contains (c: char) (s: string) = s.Contains(c)
     let trim (s: string) = s.Trim()
