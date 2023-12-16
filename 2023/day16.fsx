@@ -7,6 +7,10 @@ open AOC.Utils
 let input = System.IO.File.ReadAllLines("data/day16-input.txt")
 
 let grid = input |> array2D
+let maxRow = Array2D.length1 grid - 1
+let maxCol = Array2D.length2 grid - 1
+let rowRange = [ 0..maxRow ]
+let colRange = [ 0..maxCol ]
 
 type Dir =
     | Up
@@ -48,9 +52,7 @@ let nextState beam =
         | _ -> []
 
     newBeams
-    |> List.filter (fun (_, p) ->
-        isBetween 0 (Array2D.length1 grid - 1) p.r
-        && isBetween 0 (Array2D.length2 grid - 1) p.c)
+    |> List.filter (fun (_, p) -> isBetween 0 maxRow p.r && isBetween 0 maxCol p.c)
 
 let rec traverse (visited: Map<Dir * GridPoint, bool>) beams =
     let beams' =
@@ -64,8 +66,16 @@ let rec traverse (visited: Map<Dir * GridPoint, bool>) beams =
         let visited' = visited |> Map.add x true
         traverse visited' ((nextState x) @ xs)
 
-traverse (Map []) [ (Dir.Right, { r = 0; c = 0 }) ]
-|> Map.keys
-|> Seq.distinctBy snd
-|> Seq.length
-|> pp
+let countEnergized initState =
+    traverse (Map []) [ initState ] |> Map.keys |> Seq.distinctBy snd |> Seq.length
+
+timeOperation (fun () -> countEnergized (Dir.Right, { r = 0; c = 0 })) |> pp1
+
+timeOperation (fun () ->
+    (rowRange |> List.map (fun r -> (Dir.Right, { r = r; c = 0 })))
+    @ (rowRange |> List.map (fun r -> (Dir.Left, { r = r; c = maxCol })))
+    @ (colRange |> List.map (fun c -> (Dir.Down, { r = 0; c = c })))
+    @ (colRange |> List.map (fun c -> (Dir.Right, { r = maxRow; c = c })))
+    |> List.map countEnergized
+    |> List.max)
+|> pp2
