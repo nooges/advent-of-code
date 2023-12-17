@@ -4,7 +4,7 @@
 
 open AOC.Utils
 
-let input = System.IO.File.ReadAllLines("data/day14-sample.txt")
+let input = System.IO.File.ReadAllLines("data/day14-input.txt")
 
 let grid = input |> array2D
 
@@ -57,7 +57,6 @@ let totalLoad g =
         |> Array.filter ((=) 'O')
         |> Array.length
         |> (*) (Array2D.length2 g - row))
-    |>! pp
 
 let cycle =
     tiltUpWithTranspose
@@ -70,9 +69,35 @@ timeOperation (fun () ->
     |> List.sumBy (fun col -> grid[*, col] |> calculateLoad))
 |> pp1
 
-let numCycles = 100
+// Run enough cycles to determine when pattern repeats
+let numCycles = 200
 
-timeOperation (fun () -> [ 1..numCycles ] |> List.fold (fun g _ -> cycle g) grid |> totalLoad)
+let findCycleLen loads =
+    // Check a few values in the cycle, because some values can be repeated
+    [ 0..2 ]
+    |> List.map (fun i ->
+        let xs = loads |> List.skip i
+        let lastLoad = xs |> List.head
+
+        xs
+        |> List.tail
+        |> List.find (fun l -> (snd l) = (snd lastLoad))
+        |> fst
+        |> (-) (fst lastLoad))
+    |> List.max
+
+timeOperation (fun () ->
+    let rec loop acc n g =
+        match n with
+        | n when n > numCycles -> acc
+        | _ ->
+            let g' = cycle g
+            (n, totalLoad g') |> pp
+
+            loop ((n, totalLoad g') :: acc) (n + 1) g'
+
+    let loads = loop [] 1 grid
+    let cycleLen = findCycleLen loads
+    let offset = ((1_000_000_000 - numCycles) % cycleLen) - cycleLen + numCycles
+    loads |> List.find (fun l -> (fst l) = offset) |> snd)
 |> pp2
-
-//cycle grid |> cycle |> pp
