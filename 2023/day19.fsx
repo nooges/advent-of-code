@@ -42,7 +42,7 @@ let workflows =
     |> Array.map (withRegex "(.*){(.*),(.*)}" >> parseWorkflow)
     |> Map.ofArray
 
-let rec nextDst (rules: Rule list) (part: Map<string, int>) =
+let rec nextDst rules (part: Map<string, int>) =
     match rules with
     | [] -> None
     | x :: xs ->
