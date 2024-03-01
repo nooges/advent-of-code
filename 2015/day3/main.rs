@@ -1,10 +1,10 @@
 use std::{collections::HashSet, fs};
 
-fn visit(input: &str) -> HashSet<(i32, i32)> {
+fn visit(chars: impl Iterator<Item = char>) -> HashSet<(i32, i32)> {
     let mut pos = (0, 0);
     let mut visited = HashSet::new();
     visited.insert(pos);
-    for c in input.chars() {
+    for c in chars {
         match c {
             '<' => pos.0 += 1,
             '>' => pos.0 -= 1,
@@ -18,11 +18,13 @@ fn visit(input: &str) -> HashSet<(i32, i32)> {
 }
 
 fn part1(input: &str) -> usize {
-    return visit(input).len();
+    return visit(input.chars()).len();
 }
 
 fn part2(input: &str) -> usize {
-    return 0;
+    let v1 = visit(input.chars().step_by(2));
+    let v2 = visit(input.chars().skip(1).step_by(2));
+    return v1.union(&v2).count();
 }
 
 fn main() -> std::io::Result<()> {
