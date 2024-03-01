@@ -12,7 +12,9 @@ fn part1(input: &str) -> u32 {
 }
 
 fn part2(input: &str) -> u32 {
-    return 0;
+    return (0..)
+        .find(|n| md5hash(input, *n).starts_with("000000"))
+        .unwrap();
 }
 
 fn main() -> std::io::Result<()> {
