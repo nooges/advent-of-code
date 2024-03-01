@@ -1,6 +1,6 @@
 use std::{collections::HashSet, fs};
 
-fn part1(input: &str) -> i32 {
+fn visit(input: &str) -> HashSet<(i32, i32)> {
     let mut pos = (0, 0);
     let mut visited = HashSet::new();
     visited.insert(pos);
@@ -14,10 +14,14 @@ fn part1(input: &str) -> i32 {
         }
         visited.insert(pos);
     }
-    return visited.len() as i32;
+    return visited;
 }
 
-fn part2(input: &str) -> i32 {
+fn part1(input: &str) -> usize {
+    return visit(input).len();
+}
+
+fn part2(input: &str) -> usize {
     return 0;
 }
 
