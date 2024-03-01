@@ -24,15 +24,13 @@ fn has_double_letter(s: &str) -> bool {
     return false;
 }
 
-fn has_bad_pair(s: &str) -> bool {
-    return BAD_PAIRS.iter().any(|p| s.contains(p));
+fn has_no_bad_pairs(s: &str) -> bool {
+    return !BAD_PAIRS.iter().any(|p| s.contains(p));
 }
 
 fn part1(input: &str) -> u32 {
-    return input
-        .lines()
-        .filter(|l| has_three_vowels(l) && has_double_letter(l) && !has_bad_pair(l))
-        .count() as u32;
+    let rules = [has_three_vowels, has_double_letter, has_no_bad_pairs];
+    return input.lines().filter(|l| rules.iter().all(|f| f(l))).count() as u32;
 }
 
 fn part2(input: &str) -> u32 {
