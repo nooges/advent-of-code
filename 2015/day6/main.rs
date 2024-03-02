@@ -1,4 +1,5 @@
 use std::{
+    cmp::{max, min},
     collections::{HashMap, HashSet},
     fs,
 };
@@ -46,16 +47,8 @@ fn parse_input(input: &str) -> Vec<Instruction> {
 fn part1(data: &Vec<Instruction>) -> u32 {
     let mut lights_on = HashSet::new();
     data.iter().for_each(|i| {
-        let xr = if i.x1 < i.x2 {
-            i.x1..=i.x2
-        } else {
-            i.x2..=i.x1
-        };
-        let yr = if i.y1 < i.y2 {
-            i.y1..=i.y2
-        } else {
-            i.y2..=i.y1
-        };
+        let xr = min(i.x1, i.x2)..=max(i.x1, i.x2);
+        let yr = min(i.y1, i.y2)..=max(i.y1, i.y2);
         for x in xr {
             for y in yr.clone() {
                 match i.command {
@@ -82,16 +75,8 @@ fn part1(data: &Vec<Instruction>) -> u32 {
 fn part2(data: &Vec<Instruction>) -> u32 {
     let mut levels = HashMap::new();
     data.iter().for_each(|i| {
-        let xr = if i.x1 < i.x2 {
-            i.x1..=i.x2
-        } else {
-            i.x2..=i.x1
-        };
-        let yr = if i.y1 < i.y2 {
-            i.y1..=i.y2
-        } else {
-            i.y2..=i.y1
-        };
+        let xr = min(i.x1, i.x2)..=max(i.x1, i.x2);
+        let yr = min(i.y1, i.y2)..=max(i.y1, i.y2);
         for x in xr {
             for y in yr.clone() {
                 let d = match i.command {
