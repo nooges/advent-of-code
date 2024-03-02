@@ -94,14 +94,13 @@ fn part2(data: &Vec<Instruction>) -> u32 {
         };
         for x in xr {
             for y in yr.clone() {
-                let cur = levels.entry((x, y)).or_insert(0);
                 let d = match i.command {
                     Command::TurnOn => 1,
                     Command::TurnOff => -1,
                     Command::Toggle => 2,
                 };
-                *cur += d;
-                *cur = (*cur).max(0);
+                let cur = levels.entry((x, y)).or_insert(0);
+                *cur = (*cur + d).max(0);
             }
         }
     });
