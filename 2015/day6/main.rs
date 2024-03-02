@@ -1,4 +1,7 @@
-use std::{collections::HashSet, fs};
+use std::{
+    collections::{HashMap, HashSet},
+    fs,
+};
 
 enum Command {
     TurnOn,
@@ -77,7 +80,32 @@ fn part1(data: &Vec<Instruction>) -> u32 {
 }
 
 fn part2(data: &Vec<Instruction>) -> u32 {
-    return 0;
+    let mut levels = HashMap::new();
+    data.iter().for_each(|i| {
+        let xr = if i.x1 < i.x2 {
+            i.x1..=i.x2
+        } else {
+            i.x2..=i.x1
+        };
+        let yr = if i.y1 < i.y2 {
+            i.y1..=i.y2
+        } else {
+            i.y2..=i.y1
+        };
+        for x in xr {
+            for y in yr.clone() {
+                let cur = levels.entry((x, y)).or_insert(0);
+                let d = match i.command {
+                    Command::TurnOn => 1,
+                    Command::TurnOff => -1,
+                    Command::Toggle => 2,
+                };
+                *cur += d;
+                *cur = (*cur).max(0);
+            }
+        }
+    });
+    return levels.values().sum::<i32>() as u32;
 }
 
 fn main() -> std::io::Result<()> {
