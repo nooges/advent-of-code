@@ -92,12 +92,27 @@ fn part2(data: &Vec<Instruction>) -> u32 {
     return levels.values().sum::<i32>() as u32;
 }
 
+fn timeit<F: Fn() -> T, T>(name: &str, f: F) -> T {
+    let start = std::time::Instant::now();
+    let result = f();
+    let elapsed = start.elapsed();
+    if elapsed.as_millis() > 0 {
+        println!("{} Time: {}ms", name, elapsed.as_millis());
+    } else {
+        println!("{} Time: {}μs", name, elapsed.as_micros());
+    }
+    result
+}
+
 fn main() -> std::io::Result<()> {
     let input = fs::read_to_string("input.txt")?;
     let data = parse_input(&input);
-    let part1_result = part1(&data);
+
+    let part1_result = timeit("Part 1", || part1(&data));
     println!("Part 1: {}", part1_result);
-    let part2_result = part2(&data);
+
+    let part2_result = timeit("Part 2", || part2(&data));
     println!("Part 2: {}", part2_result);
+
     Ok(())
 }
