@@ -3,7 +3,6 @@ use std::{
     collections::{HashMap, HashSet},
     fs,
 };
-use utils::timeit;
 
 enum Command {
     TurnOn,
@@ -50,21 +49,19 @@ fn part1(data: &Vec<Instruction>) -> u32 {
     data.iter().for_each(|i| {
         let xr = min(i.x1, i.x2)..=max(i.x1, i.x2);
         let yr = min(i.y1, i.y2)..=max(i.y1, i.y2);
-        for x in xr {
-            for y in yr.clone() {
-                match i.command {
-                    Command::TurnOn => {
-                        lights_on.insert((x, y));
-                    }
-                    Command::TurnOff => {
-                        lights_on.remove(&(x, y));
-                    }
-                    Command::Toggle => {
-                        if lights_on.contains(&(x, y)) {
-                            lights_on.remove(&(x, y));
-                        } else {
-                            lights_on.insert((x, y));
-                        }
+        for p in itertools::iproduct!(xr, yr) {
+            match i.command {
+                Command::TurnOn => {
+                    lights_on.insert(p);
+                }
+                Command::TurnOff => {
+                    lights_on.remove(&p);
+                }
+                Command::Toggle => {
+                    if lights_on.contains(&p) {
+                        lights_on.remove(&p);
+                    } else {
+                        lights_on.insert(p);
                     }
                 }
             }
@@ -78,16 +75,14 @@ fn part2(data: &Vec<Instruction>) -> u32 {
     data.iter().for_each(|i| {
         let xr = min(i.x1, i.x2)..=max(i.x1, i.x2);
         let yr = min(i.y1, i.y2)..=max(i.y1, i.y2);
-        for x in xr {
-            for y in yr.clone() {
-                let d = match i.command {
-                    Command::TurnOn => 1,
-                    Command::TurnOff => -1,
-                    Command::Toggle => 2,
-                };
-                let cur = levels.entry((x, y)).or_insert(0);
-                *cur = (*cur + d).max(0);
-            }
+        for p in itertools::iproduct!(xr, yr) {
+            let d = match i.command {
+                Command::TurnOn => 1,
+                Command::TurnOff => -1,
+                Command::Toggle => 2,
+            };
+            let cur = levels.entry(p).or_insert(0);
+            *cur = (*cur + d).max(0);
         }
     });
     return levels.values().sum::<i32>() as u32;
@@ -97,10 +92,10 @@ fn main() -> std::io::Result<()> {
     let input = fs::read_to_string("input.txt")?;
     let data = parse_input(&input);
 
-    let part1_result = timeit("Part 1", || part1(&data));
+    let part1_result = utils::timeit("Part 1", || part1(&data));
     println!("Part 1: {}", part1_result);
 
-    let part2_result = timeit("Part 2", || part2(&data));
+    let part2_result = utils::timeit("Part 2", || part2(&data));
     println!("Part 2: {}", part2_result);
 
     Ok(())

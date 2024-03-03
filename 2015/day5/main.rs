@@ -1,5 +1,4 @@
 use std::fs;
-use utils::timeit;
 
 const BAD_PAIRS: [&str; 4] = ["ab", "cd", "pq", "xy"];
 
@@ -55,10 +54,10 @@ fn part2(input: &str) -> u32 {
 fn main() -> std::io::Result<()> {
     let input = fs::read_to_string("input.txt")?;
 
-    let part1_result = timeit("Part 1", || part1(&input));
+    let part1_result = utils::timeit("Part 1", || part1(&input));
     println!("Part 1: {}", part1_result);
 
-    let part2_result = timeit("Part 2", || part2(&input));
+    let part2_result = utils::timeit("Part 2", || part2(&input));
     println!("Part 2: {}", part2_result);
     Ok(())
 }

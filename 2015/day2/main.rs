@@ -31,9 +31,11 @@ fn main() -> std::io::Result<()> {
                 .collect::<Vec<i32>>();
         })
         .collect();
-    let part1_result = part1(&dims);
+
+    let part1_result = utils::timeit("Part 1", || part1(&dims));
     println!("Part 1: {}", part1_result);
-    let part2_result = part2(&dims);
+
+    let part2_result = utils::timeit("Part 2", || part2(&dims));
     println!("Part 2: {}", part2_result);
     Ok(())
 }
