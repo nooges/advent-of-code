@@ -1,21 +1,21 @@
 use std::fs;
 
-fn part1(dims: &Vec<Vec<i32>>) -> i32 {
+fn part1(dims: &Vec<Vec<u32>>) -> u32 {
     return dims
         .iter()
         .map(|dim| {
             let areas = vec![dim[0] * dim[1], dim[0] * dim[2], dim[1] * dim[2]];
-            return 2 * areas.iter().sum::<i32>() + areas.iter().min().unwrap();
+            return 2 * areas.iter().sum::<u32>() + areas.iter().min().unwrap();
         })
         .sum();
 }
 
-fn part2(dims: &Vec<Vec<i32>>) -> i32 {
+fn part2(dims: &Vec<Vec<u32>>) -> u32 {
     dims.iter()
         .map(|dim| {
             let mut s = dim.clone();
             s.sort();
-            return 2 * (s[0] + s[1]) + dim.iter().product::<i32>();
+            return 2 * (s[0] + s[1]) + dim.iter().product::<u32>();
         })
         .sum()
 }
@@ -28,14 +28,11 @@ fn main() -> std::io::Result<()> {
             return line
                 .split('x')
                 .map(|n| n.parse().unwrap())
-                .collect::<Vec<i32>>();
+                .collect::<Vec<_>>();
         })
         .collect();
 
-    let part1_result = utils::timeit("Part 1", || part1(&dims));
-    println!("Part 1: {}", part1_result);
-
-    let part2_result = utils::timeit("Part 2", || part2(&dims));
-    println!("Part 2: {}", part2_result);
+    utils::timeit("Part 1", || part1(&dims));
+    utils::timeit("Part 2", || part2(&dims));
     Ok(())
 }

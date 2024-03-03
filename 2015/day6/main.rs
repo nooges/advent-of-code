@@ -91,12 +91,8 @@ fn part2(data: &Vec<Instruction>) -> u32 {
 fn main() -> std::io::Result<()> {
     let input = fs::read_to_string("input.txt")?;
     let data = parse_input(&input);
-
-    let part1_result = utils::timeit("Part 1", || part1(&data));
-    println!("Part 1: {}", part1_result);
-
-    let part2_result = utils::timeit("Part 2", || part2(&data));
-    println!("Part 2: {}", part2_result);
+    utils::timeit("Part 1", || part1(&data));
+    utils::timeit("Part 2", || part2(&data));
 
     Ok(())
 }

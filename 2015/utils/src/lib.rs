@@ -1,11 +1,10 @@
-pub fn timeit<F: Fn() -> T, T>(name: &str, f: F) -> T {
+pub fn timeit<F: Fn() -> u32>(name: &str, f: F) {
     let start = std::time::Instant::now();
     let result = f();
     let elapsed = start.elapsed();
     if elapsed.as_millis() > 1 {
-        println!("{} Time: {}ms", name, elapsed.as_millis());
+        println!("{}: {} \tTime: {}ms", name, result, elapsed.as_millis());
     } else {
-        println!("{} Time: {}μs", name, elapsed.as_micros());
+        println!("{}: {} \tTime: {}μs", name, result, elapsed.as_micros());
     }
-    result
 }
