@@ -3,6 +3,7 @@ use std::{
     collections::{HashMap, HashSet},
     fs,
 };
+use utils::timeit;
 
 enum Command {
     TurnOn,
@@ -90,18 +91,6 @@ fn part2(data: &Vec<Instruction>) -> u32 {
         }
     });
     return levels.values().sum::<i32>() as u32;
-}
-
-fn timeit<F: Fn() -> T, T>(name: &str, f: F) -> T {
-    let start = std::time::Instant::now();
-    let result = f();
-    let elapsed = start.elapsed();
-    if elapsed.as_millis() > 1 {
-        println!("{} Time: {}ms", name, elapsed.as_millis());
-    } else {
-        println!("{} Time: {}μs", name, elapsed.as_micros());
-    }
-    result
 }
 
 fn main() -> std::io::Result<()> {

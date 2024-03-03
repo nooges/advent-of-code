@@ -1,4 +1,5 @@
 use std::fs;
+use utils::timeit;
 
 const BAD_PAIRS: [&str; 4] = ["ab", "cd", "pq", "xy"];
 
@@ -49,18 +50,6 @@ fn has_sandwiched_letter(s: &str) -> bool {
 fn part2(input: &str) -> u32 {
     let rules = [has_non_overlapping_pairs, has_sandwiched_letter];
     return input.lines().filter(|l| rules.iter().all(|f| f(l))).count() as u32;
-}
-
-fn timeit<F: Fn() -> T, T>(name: &str, f: F) -> T {
-    let start = std::time::Instant::now();
-    let result = f();
-    let elapsed = start.elapsed();
-    if elapsed.as_millis() > 1 {
-        println!("{} Time: {}ms", name, elapsed.as_millis());
-    } else {
-        println!("{} Time: {}μs", name, elapsed.as_micros());
-    }
-    result
 }
 
 fn main() -> std::io::Result<()> {
