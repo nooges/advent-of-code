@@ -5,21 +5,29 @@ fn decoded_str_len(s: &str) -> usize {
     let mut escaped = false;
     for i in s.chars() {
         match (i, escaped) {
-            ('\\', false) => {
-                escaped = true;
-            }
-            ('\\', true) | ('"', true) => {
-                escaped = false;
-                len += 1
-            }
+            ('\\', false) => escaped = true,
             ('x', true) => {
                 len -= 1;
                 escaped = false;
             }
-            _ => len += 1,
+            _ => {
+                len += 1;
+                escaped = false;
+            }
         }
     }
     (len - 2) as usize
+}
+
+fn encoded_str_len(s: &str) -> usize {
+    let mut len = 0;
+    for i in s.chars() {
+        len += match i {
+            '"' | '\\' => 2,
+            _ => 1,
+        };
+    }
+    len + 2
 }
 
 fn part1(input: &str) -> u32 {
@@ -30,7 +38,10 @@ fn part1(input: &str) -> u32 {
 }
 
 fn part2(input: &str) -> u32 {
-    return 0;
+    input
+        .lines()
+        .map(|line| encoded_str_len(line) - line.len())
+        .sum::<usize>() as u32
 }
 
 fn main() -> std::io::Result<()> {
