@@ -10,3 +10,4 @@ members = [
     "2015/day10",
     "2015/utils",
 ]
+resolver = "2"
