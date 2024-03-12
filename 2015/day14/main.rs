@@ -7,17 +7,11 @@ struct Reindeer {
     rest_time: u32,
 }
 
-fn extract_u32s(line: &str) -> Vec<u32> {
-    line.split_whitespace()
-        .filter_map(|s| s.parse::<u32>().ok())
-        .collect()
-}
-
 fn parse_input(input: &str) -> Vec<Reindeer> {
     input
         .lines()
         .map(|line| {
-            let parts = extract_u32s(line);
+            let parts = utils::extract_u32s(line);
             Reindeer {
                 speed: parts[0],
                 move_time: parts[1],
