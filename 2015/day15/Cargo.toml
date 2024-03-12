@@ -1,0 +1,12 @@
+[package]
+name = "day15"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+itertools = "0.12.1"
+utils = { path = "../utils" }
+
+[[bin]]
+name = "day15"
+path = "main.rs"
