@@ -25,7 +25,7 @@ let score (ingredients: int array array) (amounts: int list) =
     |> List.mapi (fun i amount -> ingredients[i] |> Array.map (fun a -> a * amount))
     |> List.fold (Array.map2 (+)) [| 0; 0; 0; 0; 0 |]
     |> Array.map (max 0)
-    |> (fun a -> a[0] * a[1] * a[2] * a[3])
+    |> (fun a -> [ 0..3 ] |> List.fold (*) 1)
 
 let calories (ingredients: int array array) (amounts: int list) =
     amounts |> List.mapi (fun i amount -> ingredients[i][4] * amount) |> List.sum
