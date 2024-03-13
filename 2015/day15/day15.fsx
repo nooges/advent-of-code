@@ -33,12 +33,20 @@ let calories (ingredients: int array array) (amounts: int list) =
 let ingredients = input |> Array.map allInts
 
 // Part 1
-ingredients
-|> Array.length
-|> combos
-|> Array.map (fun a -> score ingredients a)
-|> Array.max
+timeOperation (fun () ->
+    ingredients
+    |> Array.length
+    |> combos
+    |> Array.map (fun a -> score ingredients a)
+    |> Array.max)
 |> pp1
 
 // Part 2
-//comb
+timeOperation (fun () ->
+    ingredients
+    |> Array.length
+    |> combos
+    |> Array.filter (fun a -> calories ingredients a = 500)
+    |> Array.map (fun a -> score ingredients a)
+    |> Array.max)
+|> pp2
