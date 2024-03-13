@@ -44,18 +44,47 @@ fn score(ingredients: &Vec<Ingredient>, amounts: &Vec<i32>) -> u32 {
     (capacity * durability * flavor * texture) as u32
 }
 
+fn calories(ingredients: &Vec<Ingredient>, amounts: &Vec<i32>) -> i32 {
+    ingredients
+        .iter()
+        .enumerate()
+        .map(|(i, v)| v.calories * amounts[i])
+        .sum()
+}
+
+fn combos(n: i32, rem: i32) -> Vec<Vec<i32>> {
+    match (n, rem) {
+        (1, _) => vec![vec![rem]],
+        (_, 0) => vec![],
+        (_, _) => {
+            let mut ret = vec![];
+            for i in 0..=rem {
+                let mut v = combos(n - 1, rem - i);
+                v.iter_mut().for_each(|v| v.push(i));
+                ret.append(&mut v);
+            }
+            ret
+        }
+    }
+}
+
 fn part1(input: &str) -> u32 {
     let ingredients = parse_input(input);
-    (0..=100)
-        .permutations(ingredients.len())
-        .filter(|v| v.iter().sum::<i32>() == 100)
+    combos(ingredients.len() as i32, 100)
+        .iter()
         .map(|v| score(&ingredients, &v))
         .max()
         .unwrap()
 }
 
 fn part2(input: &str) -> u32 {
-    0
+    let ingredients = parse_input(input);
+    combos(ingredients.len() as i32, 100)
+        .iter()
+        .filter(|v| calories(&ingredients, v) == 500)
+        .map(|v| score(&ingredients, v))
+        .max()
+        .unwrap()
 }
 
 fn main() -> std::io::Result<()> {
