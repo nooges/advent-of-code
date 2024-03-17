@@ -1,53 +1,27 @@
 use std::fs;
 
-#[derive(Debug)]
-struct Ingredient {
-    capacity: i32,
-    durability: i32,
-    flavor: i32,
-    texture: i32,
-    calories: i32,
+fn parse_input(input: &str) -> Vec<Vec<i32>> {
+    input.lines().map(utils::extract_i32s).collect()
 }
 
-fn parse_input(input: &str) -> Vec<Ingredient> {
-    input
-        .lines()
-        .map(|line| {
-            let parts = utils::extract_i32s(line);
-            Ingredient {
-                capacity: parts[0],
-                durability: parts[1],
-                flavor: parts[2],
-                texture: parts[3],
-                calories: parts[4],
-            }
-        })
-        .collect()
+fn score(ingredients: &[Vec<i32>], amounts: &[i32]) -> u32 {
+    let mut attributes = [0, 0, 0, 0];
+    ingredients.iter().enumerate().for_each(|(i, ingredient)| {
+        (0..4).for_each(|j| {
+            attributes[j] += ingredient[j] * amounts[i];
+        });
+    });
+    (0..4).for_each(|i| {
+        attributes[i] = attributes[i].max(0);
+    });
+    attributes.iter().product::<i32>() as u32
 }
 
-fn score(ingredients: &[Ingredient], amounts: &Vec<i32>) -> u32 {
-    let mut capacity = 0;
-    let mut durability = 0;
-    let mut flavor = 0;
-    let mut texture = 0;
-    for i in 0..ingredients.len() {
-        capacity += ingredients[i].capacity * amounts[i];
-        durability += ingredients[i].durability * amounts[i];
-        flavor += ingredients[i].flavor * amounts[i];
-        texture += ingredients[i].texture * amounts[i];
-    }
-    capacity = capacity.max(0);
-    durability = durability.max(0);
-    flavor = flavor.max(0);
-    texture = texture.max(0);
-    (capacity * durability * flavor * texture) as u32
-}
-
-fn calories(ingredients: &[Ingredient], amounts: &Vec<i32>) -> i32 {
+fn calories(ingredients: &[Vec<i32>], amounts: &[i32]) -> i32 {
     ingredients
         .iter()
         .enumerate()
-        .map(|(i, v)| v.calories * amounts[i])
+        .map(|(i, v)| v[4] * amounts[i])
         .sum()
 }
 
