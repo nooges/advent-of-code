@@ -2,7 +2,7 @@ use std::fs;
 
 fn part1(input: &str) -> u32 {
     let open_chars = input.chars().filter(|&c| c == '(').count() as i32;
-    return (2 * open_chars - input.len() as i32) as u32;
+    (2 * open_chars - input.len() as i32) as u32
 }
 
 fn part2(input: &str) -> u32 {
@@ -13,7 +13,7 @@ fn part2(input: &str) -> u32 {
             return i as u32 + 1;
         }
     }
-    return floor as u32;
+    floor as u32
 }
 
 fn main() -> std::io::Result<()> {

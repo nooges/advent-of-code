@@ -3,14 +3,11 @@ use std::fs;
 const BAD_PAIRS: [&str; 4] = ["ab", "cd", "pq", "xy"];
 
 fn is_vowel(c: &char) -> bool {
-    match c {
-        'a' | 'e' | 'i' | 'o' | 'u' => true,
-        _ => false,
-    }
+    matches!(c, 'a' | 'e' | 'i' | 'o' | 'u')
 }
 
 fn has_three_vowels(s: &str) -> bool {
-    return s.chars().filter(|c| is_vowel(c)).count() >= 3;
+    return s.chars().filter(is_vowel).count() >= 3;
 }
 
 fn has_double_letter(s: &str) -> bool {
@@ -21,7 +18,7 @@ fn has_double_letter(s: &str) -> bool {
         }
         last = c;
     }
-    return false;
+    false
 }
 
 fn has_no_bad_pairs(s: &str) -> bool {
@@ -39,16 +36,16 @@ fn has_non_overlapping_pairs(s: &str) -> bool {
             return true;
         }
     }
-    return false;
+    false
 }
 
 fn has_sandwiched_letter(s: &str) -> bool {
-    return s.chars().skip(2).zip(s.chars()).any(|(a, b)| a == b);
+    s.chars().skip(2).zip(s.chars()).any(|(a, b)| a == b)
 }
 
 fn part2(input: &str) -> u32 {
     let rules = [has_non_overlapping_pairs, has_sandwiched_letter];
-    return input.lines().filter(|l| rules.iter().all(|f| f(l))).count() as u32;
+    input.lines().filter(|l| rules.iter().all(|f| f(l))).count() as u32
 }
 
 fn main() -> std::io::Result<()> {

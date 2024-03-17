@@ -14,17 +14,17 @@ fn visit(chars: impl Iterator<Item = char>) -> HashSet<(i32, i32)> {
         }
         visited.insert(pos);
     }
-    return visited;
+    visited
 }
 
 fn part1(input: &str) -> u32 {
-    return visit(input.chars()).len() as u32;
+    visit(input.chars()).len() as u32
 }
 
 fn part2(input: &str) -> u32 {
     let v1 = visit(input.chars().step_by(2));
     let v2 = visit(input.chars().skip(1).step_by(2));
-    return v1.union(&v2).count() as u32;
+    v1.union(&v2).count() as u32
 }
 
 fn main() -> std::io::Result<()> {

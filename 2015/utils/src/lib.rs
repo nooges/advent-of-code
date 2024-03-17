@@ -12,7 +12,7 @@ pub fn timeit<F: Fn() -> u32>(name: &str, f: F) {
 }
 
 pub fn extract_u32s(input: &str) -> Vec<u32> {
-    let re = Regex::new(r"?\d+").unwrap();
+    let re = Regex::new(r"\d+").unwrap();
     re.find_iter(input)
         .map(|m| m.as_str().parse().unwrap())
         .collect()

@@ -1,4 +1,3 @@
-use itertools::Itertools;
 use std::fs;
 
 #[derive(Debug)]
@@ -26,7 +25,7 @@ fn parse_input(input: &str) -> Vec<Ingredient> {
         .collect()
 }
 
-fn score(ingredients: &Vec<Ingredient>, amounts: &Vec<i32>) -> u32 {
+fn score(ingredients: &[Ingredient], amounts: &Vec<i32>) -> u32 {
     let mut capacity = 0;
     let mut durability = 0;
     let mut flavor = 0;
@@ -44,7 +43,7 @@ fn score(ingredients: &Vec<Ingredient>, amounts: &Vec<i32>) -> u32 {
     (capacity * durability * flavor * texture) as u32
 }
 
-fn calories(ingredients: &Vec<Ingredient>, amounts: &Vec<i32>) -> i32 {
+fn calories(ingredients: &[Ingredient], amounts: &Vec<i32>) -> i32 {
     ingredients
         .iter()
         .enumerate()
@@ -72,7 +71,7 @@ fn part1(input: &str) -> u32 {
     let ingredients = parse_input(input);
     combos(ingredients.len() as i32, 100)
         .iter()
-        .map(|v| score(&ingredients, &v))
+        .map(|v| score(&ingredients, v))
         .max()
         .unwrap()
 }

@@ -2,19 +2,19 @@ use std::fs;
 
 fn md5hash(key: &str, num: u32) -> String {
     let res = md5::compute(format!("{}{}", key, num));
-    return format!("{:x}", res);
+    format!("{:x}", res)
 }
 
 fn part1(input: &str) -> u32 {
-    return (0..)
+    (0..)
         .find(|n| md5hash(input, *n).starts_with("00000"))
-        .unwrap();
+        .unwrap()
 }
 
 fn part2(input: &str) -> u32 {
-    return (0..)
+    (0..)
         .find(|n| md5hash(input, *n).starts_with("000000"))
-        .unwrap();
+        .unwrap()
 }
 
 fn main() -> std::io::Result<()> {

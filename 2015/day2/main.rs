@@ -28,7 +28,7 @@ fn main() -> std::io::Result<()> {
             return line
                 .split('x')
                 .map(|n| n.parse().unwrap())
-                .collect::<Vec<_>>();
+                .collect::<Vec<u32>>();
         })
         .collect();
 

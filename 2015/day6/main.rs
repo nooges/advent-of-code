@@ -19,7 +19,7 @@ struct Instruction {
 }
 
 fn parse_input(input: &str) -> Vec<Instruction> {
-    let t: Vec<Instruction> = input
+    input
         .lines()
         .map(|line| {
             let line = line.replace("turn ", "");
@@ -39,12 +39,10 @@ fn parse_input(input: &str) -> Vec<Instruction> {
                 y2: p2[1].parse().unwrap(),
             }
         })
-        .collect();
-
-    return t;
+        .collect()
 }
 
-fn part1(data: &Vec<Instruction>) -> u32 {
+fn part1(data: &[Instruction]) -> u32 {
     let mut lights_on = HashSet::new();
     data.iter().for_each(|i| {
         let xr = min(i.x1, i.x2)..=max(i.x1, i.x2);
@@ -67,10 +65,10 @@ fn part1(data: &Vec<Instruction>) -> u32 {
             }
         }
     });
-    return lights_on.len() as u32;
+    lights_on.len() as u32
 }
 
-fn part2(data: &Vec<Instruction>) -> u32 {
+fn part2(data: &[Instruction]) -> u32 {
     let mut levels = HashMap::new();
     data.iter().for_each(|i| {
         let xr = min(i.x1, i.x2)..=max(i.x1, i.x2);
@@ -85,7 +83,7 @@ fn part2(data: &Vec<Instruction>) -> u32 {
             *cur = (*cur + d).max(0);
         }
     });
-    return levels.values().sum::<i32>() as u32;
+    levels.values().sum::<i32>() as u32
 }
 
 fn main() -> std::io::Result<()> {
