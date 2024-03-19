@@ -22,6 +22,14 @@ fn part1(input: &str) -> u32 {
 }
 
 fn part2(input: &str) -> u32 {
+    let containers = parse_input(input);
+
+    for n in 0..containers.len() {
+        let ways = num_combos(containers.clone(), n + 1);
+        if ways != 0 {
+            return ways;
+        }
+    }
     0
 }
 
