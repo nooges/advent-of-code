@@ -1,0 +1,11 @@
+[package]
+name = "dayX"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+utils = { path = "../utils" }
+
+[[bin]]
+name = "dayX"
+path = "main.rs"
