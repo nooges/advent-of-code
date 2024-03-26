@@ -1,5 +1,5 @@
 [package]
-name = "dayX"
+name = "dayxx"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,5 +7,5 @@ edition = "2021"
 utils = { path = "../utils" }
 
 [[bin]]
-name = "dayX"
+name = "dayxx"
 path = "main.rs"

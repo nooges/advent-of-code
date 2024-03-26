@@ -1,5 +1,3 @@
-use std::fs;
-
 fn part1(dims: &Vec<Vec<u32>>) -> u32 {
     return dims
         .iter()
@@ -21,7 +19,7 @@ fn part2(dims: &Vec<Vec<u32>>) -> u32 {
 }
 
 fn main() -> std::io::Result<()> {
-    let input = fs::read_to_string("input.txt")?;
+    let input = include_str!("input.txt");
     let dims = input
         .lines()
         .map(|line| {

@@ -1,4 +1,4 @@
-use std::{cmp::min, fs};
+use std::cmp::min;
 
 #[derive(Debug)]
 struct Reindeer {
@@ -58,7 +58,7 @@ fn part2(input: &str) -> u32 {
 }
 
 fn main() -> std::io::Result<()> {
-    let input = fs::read_to_string("input.txt")?;
+    let input = include_str!("input.txt");
     utils::timeit("Part 1", || part1(&input));
     utils::timeit("Part 2", || part2(&input));
 

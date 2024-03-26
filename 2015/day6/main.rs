@@ -1,7 +1,6 @@
 use std::{
     cmp::{max, min},
     collections::{HashMap, HashSet},
-    fs,
 };
 
 enum Command {
@@ -87,7 +86,7 @@ fn part2(data: &[Instruction]) -> u32 {
 }
 
 fn main() -> std::io::Result<()> {
-    let input = fs::read_to_string("input.txt")?;
+    let input = include_str!("input.txt");
     let data = parse_input(&input);
     utils::timeit("Part 1", || part1(&data));
     utils::timeit("Part 2", || part2(&data));
