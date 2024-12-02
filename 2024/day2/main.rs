@@ -7,8 +7,7 @@ fn is_safe(report: &[u32]) -> bool {
 }
 
 fn is_safe_dampened(report: &[u32]) -> bool {
-    is_safe(report)
-        || (0..report.len()).any(|i| is_safe(&[&report[..i], &report[i + 1..]].concat()))
+    (0..report.len()).any(|i| is_safe(&[&report[..i], &report[i + 1..]].concat()))
 }
 
 fn part1(reports: &[Vec<u32>]) -> u32 {
