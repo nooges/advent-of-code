@@ -5,7 +5,6 @@ edition = "2021"
 
 [dependencies]
 aoc2024_utils = { path = "../utils" }
-itertools = "0.13.0"
 
 [[bin]]
 name = "day1"
