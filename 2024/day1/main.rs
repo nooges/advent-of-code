@@ -4,10 +4,7 @@ fn part1(pairs: &[Vec<u32>]) -> u32 {
     let col1: Vec<u32> = pairs.iter().map(|p| p[0]).sorted().collect();
     let col2: Vec<u32> = pairs.iter().map(|p| p[1]).sorted().collect();
 
-    col1.iter()
-        .zip(col2.iter())
-        .map(|(a, b)| a.abs_diff(*b))
-        .sum()
+    col1.into_iter().zip(col2).map(|(a, b)| a.abs_diff(b)).sum()
 }
 
 fn similarity(n: u32, v: &[u32]) -> u32 {
