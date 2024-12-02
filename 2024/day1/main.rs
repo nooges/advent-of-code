@@ -1,16 +1,12 @@
 use itertools::Itertools;
 
-fn dist(a: u32, b: u32) -> u32 {
-    (a as i32 - b as i32).unsigned_abs()
-}
-
 fn part1(pairs: &[Vec<u32>]) -> u32 {
     let col1: Vec<u32> = pairs.iter().map(|p| p[0]).sorted().collect();
     let col2: Vec<u32> = pairs.iter().map(|p| p[1]).sorted().collect();
 
     col1.iter()
         .zip(col2.iter())
-        .map(|(a, b)| dist(*a, *b))
+        .map(|(a, b)| a.abs_diff(*b))
         .sum()
 }
 
