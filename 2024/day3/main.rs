@@ -9,18 +9,18 @@ fn part1(input: &str) -> u32 {
 
 fn part2(input: &str) -> u32 {
     let re = Regex::new(r"mul\(\d+,\d+\)|don't\(\)|do\(\)").unwrap();
-    let matches = re.find_iter(input).map(|m| m.as_str()).collect::<Vec<_>>();
-    let mut flag = true;
-    let mut sum = 0;
-    for m in matches {
-        match m {
-            "don't" => flag = false,
-            "do" => flag = true,
-            _ if flag => sum += aoc2024_utils::extract_u32s(m).iter().product::<u32>(),
-            _ => (),
-        }
-    }
-    sum
+    re.find_iter(input)
+        .map(|m| m.as_str())
+        .fold((0, true), |(acc, enabled), m| match m {
+            "don't()" => (acc, false),
+            "do()" => (acc, true),
+            _ if enabled => (
+                acc + aoc2024_utils::extract_u32s(m).iter().product::<u32>(),
+                enabled,
+            ),
+            _ => (acc, enabled),
+        })
+        .0
 }
 
 fn main() -> std::io::Result<()> {
