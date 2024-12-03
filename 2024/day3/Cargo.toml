@@ -1,11 +1,12 @@
 [package]
-name = "aoc2024_day2"
+name = "aoc2024_day3"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
 aoc2024_utils = { path = "../utils" }
+regex = "1"
 
 [[bin]]
-name = "day2"
+name = "day3"
 path = "main.rs"
