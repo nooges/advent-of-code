@@ -1,14 +1,8 @@
-fn look(
-    look_dirs: &[Vec<(usize, usize)>],
-    search: &str,
-    r: usize,
-    c: usize,
-    rows: &[&[u8]],
-) -> u32 {
+fn look(look_dirs: &[Vec<(usize, usize)>], word: &str, r: usize, c: usize, rows: &[&[u8]]) -> u32 {
     let ncols = rows[0].len();
     let nrows = rows.len();
-    let search_fwd = search.as_bytes();
-    let search_rev = &search_fwd.iter().rev().copied().collect::<Vec<_>>();
+    let word_fwd = word.as_bytes();
+    let word_rev = &word_fwd.iter().rev().copied().collect::<Vec<_>>();
 
     look_dirs
         .iter()
@@ -24,7 +18,7 @@ fn look(
                 })
                 .collect::<Vec<u8>>()
         })
-        .filter(|s| s == search_fwd || s == search_rev)
+        .filter(|s| s == word_fwd || s == word_rev)
         .count() as u32
 }
 
@@ -37,12 +31,12 @@ fn part1(input: &str) -> u32 {
         vec![(0, 0), (1, 1), (2, 2), (3, 3)], // diagonal down
         vec![(3, 0), (2, 1), (1, 2), (0, 3)], // diagonal up
     ];
-    let search = "XMAS";
+    let search_word = "XMAS";
 
     (0..rows[0].len())
         .map(|c| {
             (0..rows.len())
-                .map(|r| look(&look_dirs, search, r, c, &rows[..]))
+                .map(|r| look(&look_dirs, search_word, r, c, &rows[..]))
                 .sum::<u32>()
         })
         .sum()
@@ -55,12 +49,12 @@ fn part2(input: &str) -> u32 {
         vec![(0, 0), (1, 1), (2, 2)], // diagonal down
         vec![(2, 0), (1, 1), (0, 2)], // diagonal up
     ];
-    let search = "MAS";
+    let search_word = "MAS";
 
     (0..rows[0].len())
         .map(|c| {
             (0..rows.len())
-                .filter(|&r| look(&look_dirs, search, r, c, &rows[..]) == 2)
+                .filter(|&r| look(&look_dirs, search_word, r, c, &rows[..]) == 2)
                 .count()
         })
         .sum::<usize>() as u32
