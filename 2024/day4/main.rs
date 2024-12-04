@@ -1,12 +1,14 @@
-fn look_for_xmas(r: usize, c: usize, rows: &[&str]) -> u32 {
-    let look_dirs = [
-        [(0, 0), (0, 1), (0, 2), (0, 3)], // horizontal
-        [(0, 0), (1, 0), (2, 0), (3, 0)], // vertical
-        [(0, 0), (1, 1), (2, 2), (3, 3)], // diagonal down
-        [(3, 0), (2, 1), (1, 2), (0, 3)], // diagonal up
-    ];
+fn look(
+    look_dirs: &Vec<Vec<(usize, usize)>>,
+    search: &str,
+    r: usize,
+    c: usize,
+    rows: &[&str],
+) -> u32 {
     let ncols = rows[0].len();
     let nrows = rows.len();
+    let search_bytes = search.as_bytes();
+    let search_rev_bytes: Vec<u8> = search_bytes.iter().rev().copied().collect();
 
     look_dirs
         .iter()
@@ -21,32 +23,7 @@ fn look_for_xmas(r: usize, c: usize, rows: &[&str]) -> u32 {
                 })
                 .collect::<Vec<u8>>()
         })
-        .filter(|s| s == "XMAS".as_bytes() || s == "SAMX".as_bytes())
-        .count() as u32
-}
-
-fn look_for_x_mas(r: usize, c: usize, rows: &[&str]) -> u32 {
-    let look_dirs = [
-        [(0, 0), (1, 1), (2, 2)], // diagonal down
-        [(2, 0), (1, 1), (0, 2)], // diagonal up
-    ];
-    let ncols = rows[0].len();
-    let nrows = rows.len();
-
-    look_dirs
-        .iter()
-        .map(|dirs| {
-            dirs.iter()
-                .map(|(dr, dc)| {
-                    if r + dr < nrows && c + dc < ncols {
-                        rows[r + dr].as_bytes()[c + dc]
-                    } else {
-                        b' '
-                    }
-                })
-                .collect::<Vec<u8>>()
-        })
-        .filter(|s| s == "MAS".as_bytes() || s == "SAM".as_bytes())
+        .filter(|s| s == search_bytes || s == &search_rev_bytes)
         .count() as u32
 }
 
@@ -55,10 +32,18 @@ fn part1(input: &str) -> u32 {
     let ncols = rows[0].len();
     let nrows = rows.len();
 
+    let look_dirs = vec![
+        vec![(0, 0), (0, 1), (0, 2), (0, 3)], // horizontal
+        vec![(0, 0), (1, 0), (2, 0), (3, 0)], // vertical
+        vec![(0, 0), (1, 1), (2, 2), (3, 3)], // diagonal down
+        vec![(3, 0), (2, 1), (1, 2), (0, 3)], // diagonal up
+    ];
+    let search = "XMAS";
+
     (0..ncols)
         .map(|c| {
             (0..nrows)
-                .map(|r| look_for_xmas(r, c, &rows[..]))
+                .map(|r| look(&look_dirs, search, r, c, &rows[..]))
                 .sum::<u32>()
         })
         .sum()
@@ -69,10 +54,16 @@ fn part2(input: &str) -> u32 {
     let ncols = rows[0].len();
     let nrows = rows.len();
 
+    let look_dirs = vec![
+        vec![(0, 0), (1, 1), (2, 2)], // diagonal down
+        vec![(2, 0), (1, 1), (0, 2)], // diagonal up
+    ];
+    let search = "MAS";
+
     (0..ncols)
         .map(|c| {
             (0..nrows)
-                .filter(|&r| look_for_x_mas(r, c, &rows[..]) == 2)
+                .filter(|&r| look(&look_dirs, search, r, c, &rows[..]) == 2)
                 .count()
         })
         .sum::<usize>() as u32
