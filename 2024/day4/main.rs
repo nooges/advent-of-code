@@ -1,4 +1,4 @@
-fn look_for_xmas(r: usize, c: usize, rows: &Vec<&str>) -> u32 {
+fn look_for_xmas(r: usize, c: usize, rows: &[&str]) -> u32 {
     let look_dirs = [
         [(0, 0), (0, 1), (0, 2), (0, 3)], // horizontal
         [(0, 0), (1, 0), (2, 0), (3, 0)], // vertical
@@ -25,7 +25,7 @@ fn look_for_xmas(r: usize, c: usize, rows: &Vec<&str>) -> u32 {
         .count() as u32
 }
 
-fn look_for_x_mas(r: usize, c: usize, rows: &Vec<&str>) -> u32 {
+fn look_for_x_mas(r: usize, c: usize, rows: &[&str]) -> u32 {
     let look_dirs = [
         [(0, 0), (1, 1), (2, 2)], // diagonal down
         [(2, 0), (1, 1), (0, 2)], // diagonal up
@@ -56,7 +56,11 @@ fn part1(input: &str) -> u32 {
     let nrows = rows.len();
 
     (0..ncols)
-        .map(|c| (0..nrows).map(|r| look_for_xmas(r, c, &rows)).sum::<u32>())
+        .map(|c| {
+            (0..nrows)
+                .map(|r| look_for_xmas(r, c, &rows[..]))
+                .sum::<u32>()
+        })
         .sum()
 }
 
@@ -68,7 +72,7 @@ fn part2(input: &str) -> u32 {
     (0..ncols)
         .map(|c| {
             (0..nrows)
-                .filter(|&r| look_for_x_mas(r, c, &rows) == 2)
+                .filter(|&r| look_for_x_mas(r, c, &rows[..]) == 2)
                 .count()
         })
         .sum::<usize>() as u32
