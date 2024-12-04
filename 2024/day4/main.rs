@@ -1,4 +1,10 @@
-fn look(look_dirs: &[Vec<(usize, usize)>], search: &str, r: usize, c: usize, rows: &[&str]) -> u32 {
+fn look(
+    look_dirs: &[Vec<(usize, usize)>],
+    search: &str,
+    r: usize,
+    c: usize,
+    rows: &[&[u8]],
+) -> u32 {
     let ncols = rows[0].len();
     let nrows = rows.len();
     let search_fwd = search.as_bytes();
@@ -11,7 +17,7 @@ fn look(look_dirs: &[Vec<(usize, usize)>], search: &str, r: usize, c: usize, row
                 .map(|(dr, dc)| {
                     let (nr, nc) = (r + dr, c + dc);
                     if nr < nrows && nc < ncols {
-                        rows[nr].as_bytes()[nc]
+                        rows[nr][nc]
                     } else {
                         b' '
                     }
@@ -23,7 +29,7 @@ fn look(look_dirs: &[Vec<(usize, usize)>], search: &str, r: usize, c: usize, row
 }
 
 fn part1(input: &str) -> u32 {
-    let rows = input.lines().collect::<Vec<_>>();
+    let rows = input.lines().map(|l| l.as_bytes()).collect::<Vec<_>>();
 
     let look_dirs = [
         vec![(0, 0), (0, 1), (0, 2), (0, 3)], // horizontal
@@ -43,7 +49,7 @@ fn part1(input: &str) -> u32 {
 }
 
 fn part2(input: &str) -> u32 {
-    let rows = input.lines().collect::<Vec<_>>();
+    let rows = input.lines().map(|l| l.as_bytes()).collect::<Vec<_>>();
 
     let look_dirs = [
         vec![(0, 0), (1, 1), (2, 2)], // diagonal down
