@@ -1,8 +1,9 @@
 use itertools::Itertools;
+use std::collections::HashSet;
 
-fn page_lt(a: &str, b: &str, rules: &str) -> bool {
+fn page_lt(a: &str, b: &str, rules: &HashSet<&str>) -> bool {
     let search = format!("{}|{}", a, b);
-    rules.contains(&search)
+    rules.contains(&search.as_str())
 }
 
 fn middle_page(pages: Vec<&str>) -> u32 {
@@ -11,7 +12,8 @@ fn middle_page(pages: Vec<&str>) -> u32 {
 
 fn part1(input: &str) -> u32 {
     let (rules, updates) = input.split_once("\n\n").unwrap();
-    let cmp_pages = |a: &&str, b: &&str| page_lt(a, b, rules);
+    let ruleset: HashSet<_> = rules.lines().collect();
+    let cmp_pages = |a: &&str, b: &&str| page_lt(a, b, &ruleset);
     updates
         .lines()
         .map(|l| l.split(",").collect::<Vec<_>>())
@@ -22,7 +24,8 @@ fn part1(input: &str) -> u32 {
 
 fn part2(input: &str) -> u32 {
     let (rules, updates) = input.split_once("\n\n").unwrap();
-    let cmp_pages = |a: &&str, b: &&str| page_lt(a, b, rules);
+    let ruleset: HashSet<_> = rules.lines().collect();
+    let cmp_pages = |a: &&str, b: &&str| page_lt(a, b, &ruleset);
     updates
         .lines()
         .map(|l| l.split(",").collect::<Vec<_>>())
