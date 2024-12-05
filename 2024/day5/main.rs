@@ -1,4 +1,5 @@
 use itertools::Itertools;
+use std::cmp::Ordering;
 
 fn cmp_pages(a: &str, b: &str, rules: &str) -> bool {
     let search = format!("{}|{}", a, b);
@@ -26,9 +27,9 @@ fn part2(input: &str) -> u32 {
                 .iter()
                 .sorted_by(|a, b| {
                     if cmp_pages(a, b, rules) {
-                        std::cmp::Ordering::Less
+                        Ordering::Less
                     } else {
-                        std::cmp::Ordering::Greater
+                        Ordering::Greater
                     }
                 })
                 .collect::<Vec<_>>();
