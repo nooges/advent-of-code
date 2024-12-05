@@ -6,13 +6,17 @@ fn cmp_pages(a: &str, b: &str, rules: &str) -> bool {
     rules.contains(&search)
 }
 
+fn middle_page(pages: Vec<&str>) -> u32 {
+    pages[pages.len() / 2].parse::<u32>().unwrap()
+}
+
 fn part1(input: &str) -> u32 {
     let (rules, updates) = input.split_once("\n\n").unwrap();
     updates
         .lines()
         .map(|l| l.split(",").collect::<Vec<_>>())
         .filter(|pages| pages.is_sorted_by(|a, b| cmp_pages(a, b, rules)))
-        .map(|pages| pages[pages.len() / 2].parse::<u32>().unwrap())
+        .map(middle_page)
         .sum()
 }
 
@@ -23,8 +27,8 @@ fn part2(input: &str) -> u32 {
         .map(|l| l.split(",").collect::<Vec<_>>())
         .filter(|pages| !pages.is_sorted_by(|a, b| cmp_pages(a, b, rules)))
         .map(|pages| {
-            let sorted_pages = pages
-                .iter()
+            let sorted_pages: Vec<&str> = pages
+                .into_iter()
                 .sorted_by(|a, b| {
                     if cmp_pages(a, b, rules) {
                         Ordering::Less
@@ -33,7 +37,7 @@ fn part2(input: &str) -> u32 {
                     }
                 })
                 .collect::<Vec<_>>();
-            sorted_pages[pages.len() / 2].parse::<u32>().unwrap()
+            middle_page(sorted_pages)
         })
         .sum()
 }
