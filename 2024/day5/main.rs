@@ -1,6 +1,6 @@
 use itertools::Itertools;
 
-fn cmp_pages(a: &str, b: &str, rules: &str) -> bool {
+fn page_lt(a: &str, b: &str, rules: &str) -> bool {
     let search = format!("{}|{}", a, b);
     rules.contains(&search)
 }
@@ -11,27 +11,29 @@ fn middle_page(pages: Vec<&str>) -> u32 {
 
 fn part1(input: &str) -> u32 {
     let (rules, updates) = input.split_once("\n\n").unwrap();
+    let cmp_pages = |a: &&str, b: &&str| page_lt(a, b, rules);
     updates
         .lines()
         .map(|l| l.split(",").collect::<Vec<_>>())
-        .filter(|pages| pages.is_sorted_by(|a, b| cmp_pages(a, b, rules)))
+        .filter(|pages| pages.is_sorted_by(cmp_pages))
         .map(middle_page)
         .sum()
 }
 
 fn part2(input: &str) -> u32 {
     let (rules, updates) = input.split_once("\n\n").unwrap();
+    let cmp_pages = |a: &&str, b: &&str| page_lt(a, b, rules);
     updates
         .lines()
         .map(|l| l.split(",").collect::<Vec<_>>())
-        .filter(|pages| !pages.is_sorted_by(|a, b| cmp_pages(a, b, rules)))
+        .filter(|pages| !pages.is_sorted_by(cmp_pages))
         .map(|pages| {
-            let sorted_pages: Vec<&str> = pages
+            pages
                 .into_iter()
-                .sorted_by(|a, b| true.cmp(&cmp_pages(a, b, rules)))
-                .collect::<Vec<_>>();
-            middle_page(sorted_pages)
+                .sorted_by(|a, b| true.cmp(&cmp_pages(a, b)))
+                .collect::<Vec<_>>()
         })
+        .map(middle_page)
         .sum()
 }
 
