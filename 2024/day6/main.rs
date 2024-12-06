@@ -1,6 +1,7 @@
 use fxhash::FxHashSet;
 use itertools::{iproduct, Itertools};
 use num::complex::Complex;
+use rayon::prelude::*;
 
 #[derive(Clone)]
 struct Grid {
@@ -78,7 +79,7 @@ fn part1(input: &str) -> u32 {
 fn part2(input: &str) -> u32 {
     let (start, grid) = parse_input(input);
     traversed_positions(start, &grid)
-        .into_iter()
+        .into_par_iter()
         .filter(|p| {
             let mut test_grid = grid.clone();
             test_grid.obstacles.insert(*p);
