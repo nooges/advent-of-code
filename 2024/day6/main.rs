@@ -45,11 +45,11 @@ fn traverse(start: Complex<i32>, grid: &Grid) -> (bool, HashSet<(Complex<i32>, i
     loop {
         let next = p + DIRS[dir as usize];
         if next.re < 0 || next.re >= grid.nrows || next.im < 0 || next.im >= grid.ncols {
-            return (false, traversed);
+            return (false, traversed); // Out of bounds
         } else if grid.obstacles.contains(&next) {
             dir = (dir + 1) % 4;
         } else if traversed.contains(&(next, dir)) {
-            return (true, traversed);
+            return (true, traversed); // Loop detected
         } else {
             p = next;
             traversed.insert((p, dir));
