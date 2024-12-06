@@ -33,24 +33,17 @@ fn parse_input(input: &str) -> (Complex<i32>, Grid) {
     )
 }
 
-const DIRS: [Complex<i32>; 4] = [
-    Complex::new(-1, 0),
-    Complex::new(0, 1),
-    Complex::new(1, 0),
-    Complex::new(0, -1),
-];
-
-fn traverse(start: Complex<i32>, grid: &Grid) -> (bool, FxHashSet<(Complex<i32>, i32)>) {
-    let mut traversed = FxHashSet::default();
-    traversed.insert((start, 0));
+fn traverse(start: Complex<i32>, grid: &Grid) -> (bool, FxHashSet<(Complex<i32>, Complex<i32>)>) {
     let mut p = start;
-    let mut dir = 0;
+    let mut dir = Complex::new(-1, 0);
+    let mut traversed = FxHashSet::default();
+    traversed.insert((start, dir));
     loop {
-        let next = p + DIRS[dir as usize];
+        let next = p + dir;
         if next.re < 0 || next.re >= grid.nrows || next.im < 0 || next.im >= grid.ncols {
             return (false, traversed); // Out of bounds
         } else if grid.obstacles.contains(&next) {
-            dir = (dir + 1) % 4;
+            dir *= Complex::new(0, -1); // Rotate right
         } else if traversed.contains(&(next, dir)) {
             return (true, traversed); // Loop detected
         } else {
