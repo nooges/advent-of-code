@@ -21,7 +21,6 @@ fn parse_input(input: &str) -> (Complex<i32>, Grid) {
     let ncols = grid[0].len() as i32;
     let start = *find_symbol(&grid, b'^').iter().next().unwrap();
     let obstacles = find_symbol(&grid, b'#');
-    dbg!(start, &obstacles);
     (
         start,
         Grid {
@@ -62,18 +61,18 @@ fn part1(input: &str) -> u32 {
     traverse(start, 0, &mut traversed, &grid)
 }
 
-fn is_looped(start: Complex<i32>, grid: &Grid) -> bool {
+fn traverse(start: Complex<i32>, grid: &Grid) -> (bool, HashSet<(Complex<i32>, i32)>) {
     let mut traversed = HashSet::from([(start, 0)]);
     let mut pos = start;
     let mut dir = 0;
     loop {
         let next = pos + DIRS[dir as usize];
         if next.re < 0 || next.re >= grid.nrows || next.im < 0 || next.im >= grid.ncols {
-            return false;
+            return (false, traversed);
         } else if grid.obstacles.contains(&next) {
             dir = (dir + 1) % 4;
         } else if traversed.contains(&(next, dir)) {
-            return true;
+            return (true, traversed);
         } else {
             pos = next;
             traversed.insert((pos, dir));
@@ -84,22 +83,25 @@ fn is_looped(start: Complex<i32>, grid: &Grid) -> bool {
 fn part2(input: &str) -> u32 {
     let (start, grid) = parse_input(input);
 
-    // Generate list of positions that guard walked at original grid setup
-    let mut traversed = HashSet::new();
+    let mut test_points = HashSet::new();
 
-    fn traverse(pos: Complex<i32>, dir: u32, traversed: &mut HashSet<Complex<i32>>, grid: &Grid) {
+    fn trav(pos: Complex<i32>, dir: u32, traversed: &mut HashSet<Complex<i32>>, grid: &Grid) {
         let next = pos + DIRS[dir as usize];
         if next.re < 0 || next.re >= grid.nrows || next.im < 0 || next.im >= grid.ncols {
         } else if grid.obstacles.contains(&next) {
-            traverse(pos, (dir + 1) % 4, traversed, grid)
+            trav(pos, (dir + 1) % 4, traversed, grid)
         } else {
             traversed.insert(next);
-            traverse(next, dir, traversed, grid)
+            trav(next, dir, traversed, grid)
         }
     }
-    traverse(start, 0, &mut traversed, &grid);
+    trav(start, 0, &mut test_points, &grid);
 
-    traversed
+    //traverse(start, &grid)
+    //    .1
+    //    .into_iter()
+    //    .filter(|(pos, _)| {
+    test_points
         .into_iter()
         .filter(|pos| {
             let mut test_grid = Grid {
@@ -107,7 +109,7 @@ fn part2(input: &str) -> u32 {
                 ..grid
             };
             test_grid.obstacles.insert(*pos);
-            is_looped(start, &test_grid)
+            traverse(start, &test_grid).0
         })
         .count() as u32
 
