@@ -62,9 +62,61 @@ fn part1(input: &str) -> u32 {
     traverse(start, 0, &mut traversed, &grid)
 }
 
+fn is_looped(start: Complex<i32>, grid: &Grid) -> bool {
+    let mut traversed = HashSet::from([(start, 0)]);
+    let mut pos = start;
+    let mut dir = 0;
+    loop {
+        let next = pos + DIRS[dir as usize];
+        if next.re < 0 || next.re >= grid.nrows || next.im < 0 || next.im >= grid.ncols {
+            return false;
+        } else if grid.obstacles.contains(&next) {
+            dir = (dir + 1) % 4;
+        } else if traversed.contains(&(next, dir)) {
+            return true;
+        } else {
+            pos = next;
+            traversed.insert((pos, dir));
+        }
+    }
+}
+
+fn part2(input: &str) -> u32 {
+    let (start, grid) = parse_input(input);
+
+    // Generate list of positions that guard walked at original grid setup
+    let mut traversed = HashSet::new();
+
+    fn traverse(pos: Complex<i32>, dir: u32, traversed: &mut HashSet<Complex<i32>>, grid: &Grid) {
+        let next = pos + DIRS[dir as usize];
+        if next.re < 0 || next.re >= grid.nrows || next.im < 0 || next.im >= grid.ncols {
+        } else if grid.obstacles.contains(&next) {
+            traverse(pos, (dir + 1) % 4, traversed, grid)
+        } else {
+            traversed.insert(next);
+            traverse(next, dir, traversed, grid)
+        }
+    }
+    traverse(start, 0, &mut traversed, &grid);
+
+    traversed
+        .into_iter()
+        .filter(|pos| {
+            let mut test_grid = Grid {
+                obstacles: grid.obstacles.clone(),
+                ..grid
+            };
+            test_grid.obstacles.insert(*pos);
+            is_looped(start, &test_grid)
+        })
+        .count() as u32
+
+    // For each of those positions, check if they are looped by placing obstacle in grid
+}
+
 fn main() -> std::io::Result<()> {
     let input = include_str!("input.txt");
     aoc2024_utils::timeit("Part 1", || part1(input));
-    //aoc2024_utils::timeit("Part 2", || part2(input));
+    aoc2024_utils::timeit("Part 2", || part2(input));
     Ok(())
 }
