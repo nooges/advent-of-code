@@ -1,15 +1,15 @@
+use fxhash::FxHashSet;
 use itertools::{iproduct, Itertools};
 use num::complex::Complex;
-use std::collections::HashSet;
 
 #[derive(Clone)]
 struct Grid {
-    obstacles: HashSet<Complex<i32>>,
+    obstacles: FxHashSet<Complex<i32>>,
     nrows: i32,
     ncols: i32,
 }
 
-fn find_symbol(grid: &[&[u8]], symbol: u8) -> HashSet<Complex<i32>> {
+fn find_symbol(grid: &[&[u8]], symbol: u8) -> FxHashSet<Complex<i32>> {
     iproduct!(0..grid.len(), 0..grid[0].len())
         .filter(|&(r, c)| grid[r][c] == symbol)
         .map(|(r, c)| Complex::new(r as i32, c as i32))
@@ -39,8 +39,9 @@ const DIRS: [Complex<i32>; 4] = [
     Complex::new(0, -1),
 ];
 
-fn traverse(start: Complex<i32>, grid: &Grid) -> (bool, HashSet<(Complex<i32>, i32)>) {
-    let mut traversed = HashSet::from([(start, 0)]);
+fn traverse(start: Complex<i32>, grid: &Grid) -> (bool, FxHashSet<(Complex<i32>, i32)>) {
+    let mut traversed = FxHashSet::default();
+    traversed.insert((start, 0));
     let mut p = start;
     let mut dir = 0;
     loop {
@@ -59,7 +60,7 @@ fn traverse(start: Complex<i32>, grid: &Grid) -> (bool, HashSet<(Complex<i32>, i
 }
 
 // Remove direction from traversal results and remove starting position
-fn traversed_positions(start: Complex<i32>, grid: &Grid) -> HashSet<Complex<i32>> {
+fn traversed_positions(start: Complex<i32>, grid: &Grid) -> FxHashSet<Complex<i32>> {
     traverse(start, grid)
         .1
         .iter()
