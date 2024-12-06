@@ -40,10 +40,10 @@ const DIRS: [Complex<i32>; 4] = [
 
 fn traverse(start: Complex<i32>, grid: &Grid) -> (bool, HashSet<(Complex<i32>, i32)>) {
     let mut traversed = HashSet::from([(start, 0)]);
-    let mut pos = start;
+    let mut p = start;
     let mut dir = 0;
     loop {
-        let next = pos + DIRS[dir as usize];
+        let next = p + DIRS[dir as usize];
         if next.re < 0 || next.re >= grid.nrows || next.im < 0 || next.im >= grid.ncols {
             return (false, traversed);
         } else if grid.obstacles.contains(&next) {
@@ -51,20 +51,18 @@ fn traverse(start: Complex<i32>, grid: &Grid) -> (bool, HashSet<(Complex<i32>, i
         } else if traversed.contains(&(next, dir)) {
             return (true, traversed);
         } else {
-            pos = next;
-            traversed.insert((pos, dir));
+            p = next;
+            traversed.insert((p, dir));
         }
     }
 }
 
 // Remove direction from traversal results and remove starting position
-fn traversed_positions(
-    traversed: &HashSet<(Complex<i32>, i32)>,
-    start: Complex<i32>,
-) -> HashSet<Complex<i32>> {
-    traversed
+fn traversed_positions(start: Complex<i32>, grid: &Grid) -> HashSet<Complex<i32>> {
+    traverse(start, grid)
+        .1
         .iter()
-        .map(|(pos, _)| *pos)
+        .map(|(p, _)| *p)
         .unique()
         .filter(|p| p != &start)
         .collect()
@@ -72,24 +70,22 @@ fn traversed_positions(
 
 fn part1(input: &str) -> u32 {
     let (start, grid) = parse_input(input);
-    traversed_positions(&traverse(start, &grid).1, start).len() as u32
+    traversed_positions(start, &grid).len() as u32
 }
 
 fn part2(input: &str) -> u32 {
     let (start, grid) = parse_input(input);
-    traversed_positions(&traverse(start, &grid).1, start)
+    traversed_positions(start, &grid)
         .into_iter()
-        .filter(|pos| {
+        .filter(|p| {
             let mut test_grid = Grid {
                 obstacles: grid.obstacles.clone(),
                 ..grid
             };
-            test_grid.obstacles.insert(*pos);
+            test_grid.obstacles.insert(*p);
             traverse(start, &test_grid).0
         })
         .count() as u32
-
-    // For each of those positions, check if they are looped by placing obstacle in grid
 }
 
 fn main() -> std::io::Result<()> {
