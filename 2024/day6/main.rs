@@ -38,29 +38,6 @@ const DIRS: [Complex<i32>; 4] = [
     Complex::new(0, -1),
 ];
 
-fn part1(input: &str) -> u32 {
-    let (start, grid) = parse_input(input);
-    let mut traversed = HashSet::from([start]);
-
-    fn traverse(
-        pos: Complex<i32>,
-        dir: u32,
-        traversed: &mut HashSet<Complex<i32>>,
-        grid: &Grid,
-    ) -> u32 {
-        let next = pos + DIRS[dir as usize];
-        if next.re < 0 || next.re >= grid.nrows || next.im < 0 || next.im >= grid.ncols {
-            traversed.len() as u32
-        } else if grid.obstacles.contains(&next) {
-            traverse(pos, (dir + 1) % 4, traversed, grid)
-        } else {
-            traversed.insert(next);
-            traverse(next, dir, traversed, grid)
-        }
-    }
-    traverse(start, 0, &mut traversed, &grid)
-}
-
 fn traverse(start: Complex<i32>, grid: &Grid) -> (bool, HashSet<(Complex<i32>, i32)>) {
     let mut traversed = HashSet::from([(start, 0)]);
     let mut pos = start;
@@ -80,29 +57,28 @@ fn traverse(start: Complex<i32>, grid: &Grid) -> (bool, HashSet<(Complex<i32>, i
     }
 }
 
+fn part1(input: &str) -> u32 {
+    let (start, grid) = parse_input(input);
+
+    traverse(start, &grid)
+        .1
+        .into_iter()
+        .map(|(pos, _)| pos)
+        .unique()
+        .filter(|pos| pos != &start)
+        .collect_vec()
+        .len() as u32
+}
+
 fn part2(input: &str) -> u32 {
     let (start, grid) = parse_input(input);
 
-    let mut test_points = HashSet::new();
-
-    fn trav(pos: Complex<i32>, dir: u32, traversed: &mut HashSet<Complex<i32>>, grid: &Grid) {
-        let next = pos + DIRS[dir as usize];
-        if next.re < 0 || next.re >= grid.nrows || next.im < 0 || next.im >= grid.ncols {
-        } else if grid.obstacles.contains(&next) {
-            trav(pos, (dir + 1) % 4, traversed, grid)
-        } else {
-            traversed.insert(next);
-            trav(next, dir, traversed, grid)
-        }
-    }
-    trav(start, 0, &mut test_points, &grid);
-
-    //traverse(start, &grid)
-    //    .1
-    //    .into_iter()
-    //    .filter(|(pos, _)| {
-    test_points
+    traverse(start, &grid)
+        .1
         .into_iter()
+        .map(|(pos, _)| pos)
+        .unique()
+        .filter(|pos| pos != &start)
         .filter(|pos| {
             let mut test_grid = Grid {
                 obstacles: grid.obstacles.clone(),
