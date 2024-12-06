@@ -2,6 +2,7 @@ use itertools::{iproduct, Itertools};
 use num::complex::Complex;
 use std::collections::HashSet;
 
+#[derive(Clone)]
 struct Grid {
     obstacles: HashSet<Complex<i32>>,
     nrows: i32,
@@ -78,10 +79,7 @@ fn part2(input: &str) -> u32 {
     traversed_positions(start, &grid)
         .into_iter()
         .filter(|p| {
-            let mut test_grid = Grid {
-                obstacles: grid.obstacles.clone(),
-                ..grid
-            };
+            let mut test_grid = grid.clone();
             test_grid.obstacles.insert(*p);
             traverse(start, &test_grid).0
         })
