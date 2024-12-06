@@ -1,7 +1,7 @@
+use fxhash::FxHashSet;
 use itertools::Itertools;
-use std::collections::HashSet;
 
-fn page_lt(a: &str, b: &str, rules: &HashSet<&str>) -> bool {
+fn page_lt(a: &str, b: &str, rules: &FxHashSet<&str>) -> bool {
     let search = format!("{}|{}", a, b);
     rules.contains(&search.as_str())
 }
@@ -12,7 +12,7 @@ fn middle_page(pages: Vec<&str>) -> u32 {
 
 fn part1(input: &str) -> u32 {
     let (rules, updates) = input.split_once("\n\n").unwrap();
-    let ruleset: HashSet<_> = rules.lines().collect();
+    let ruleset: FxHashSet<_> = rules.lines().collect();
     let cmp_pages = |a: &&str, b: &&str| page_lt(a, b, &ruleset);
     updates
         .lines()
@@ -24,7 +24,7 @@ fn part1(input: &str) -> u32 {
 
 fn part2(input: &str) -> u32 {
     let (rules, updates) = input.split_once("\n\n").unwrap();
-    let ruleset: HashSet<_> = rules.lines().collect();
+    let ruleset: FxHashSet<_> = rules.lines().collect();
     let cmp_pages = |a: &&str, b: &&str| page_lt(a, b, &ruleset);
     updates
         .lines()
