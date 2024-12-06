@@ -57,28 +57,28 @@ fn traverse(start: Complex<i32>, grid: &Grid) -> (bool, HashSet<(Complex<i32>, i
     }
 }
 
+// Remove direction from traversal results and remove starting position
+fn traversed_positions(
+    traversed: &HashSet<(Complex<i32>, i32)>,
+    start: Complex<i32>,
+) -> HashSet<Complex<i32>> {
+    traversed
+        .iter()
+        .map(|(pos, _)| *pos)
+        .unique()
+        .filter(|p| p != &start)
+        .collect()
+}
+
 fn part1(input: &str) -> u32 {
     let (start, grid) = parse_input(input);
-
-    traverse(start, &grid)
-        .1
-        .into_iter()
-        .map(|(pos, _)| pos)
-        .unique()
-        .filter(|pos| pos != &start)
-        .collect_vec()
-        .len() as u32
+    traversed_positions(&traverse(start, &grid).1, start).len() as u32
 }
 
 fn part2(input: &str) -> u32 {
     let (start, grid) = parse_input(input);
-
-    traverse(start, &grid)
-        .1
+    traversed_positions(&traverse(start, &grid).1, start)
         .into_iter()
-        .map(|(pos, _)| pos)
-        .unique()
-        .filter(|pos| pos != &start)
         .filter(|pos| {
             let mut test_grid = Grid {
                 obstacles: grid.obstacles.clone(),
