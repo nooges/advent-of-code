@@ -59,7 +59,6 @@ fn traversed_positions(start: Complex<i32>, grid: &Grid) -> HashSet<Complex<i32>
         .1
         .iter()
         .map(|(p, _)| *p)
-        .unique()
         .filter(|p| p != &start)
         .collect()
 }
