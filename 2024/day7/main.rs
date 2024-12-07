@@ -30,20 +30,28 @@ fn equation_possible(
     operands: &[u64],
     possible_ops: &[fn(u64, u64) -> u64],
 ) -> bool {
-    let mut combinations = std::iter::repeat(possible_ops)
-        .take(operands.len() - 1)
-        .multi_cartesian_product();
-
-    combinations.any(|combination| {
-        let mut result = operands[0];
-        for (op, item) in combination.iter().zip(operands.iter().skip(1)) {
-            result = op(result, *item);
-            if result > test_value {
-                return false;
-            }
+    fn helper(
+        test_value: u64,
+        result: u64,
+        operands: &[u64],
+        possible_ops: &[fn(u64, u64) -> u64],
+    ) -> bool {
+        if result > test_value {
+            return false;
+        } else if operands.is_empty() {
+            return result == test_value;
         }
-        result == test_value
-    })
+        possible_ops.iter().any(|op| {
+            helper(
+                test_value,
+                op(result, operands[0]),
+                &operands[1..],
+                possible_ops,
+            )
+        })
+    }
+
+    helper(test_value, operands[0], &operands[1..], possible_ops)
 }
 
 fn part1(input: &str) -> u64 {
