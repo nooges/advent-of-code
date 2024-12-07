@@ -26,20 +26,17 @@ fn concat(a: u64, b: u64) -> u64 {
 }
 
 fn equation_possible(test_value: u64, items: &[u64], possible_ops: &[fn(u64, u64) -> u64]) -> bool {
-    let combinations = std::iter::repeat(possible_ops)
+    let mut combinations = std::iter::repeat(possible_ops)
         .take(items.len() - 1)
         .multi_cartesian_product();
 
-    for combination in combinations {
+    combinations.any(|combination| {
         let result = combination
-            .into_iter()
+            .iter()
             .zip(items.iter().skip(1))
             .fold(items[0], |acc, (op, item)| op(acc, *item));
-        if result == test_value {
-            return true;
-        }
-    }
-    false
+        result == test_value
+    })
 }
 
 fn part1(input: &str) -> u64 {
