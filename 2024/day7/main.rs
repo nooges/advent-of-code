@@ -49,7 +49,7 @@ fn equation_possible(
 fn part1(input: &str) -> u64 {
     let possible_ops: [fn(u64, u64) -> u64; 2] = [u64::add, u64::mul];
     parse_input(input)
-        .iter()
+        .par_iter()
         .filter(|eq| equation_possible(eq.test_value, &eq.operands, &possible_ops))
         .map(|eq| eq.test_value)
         .sum()
