@@ -1,3 +1,4 @@
+use fix_fn::fix_fn;
 use itertools::Itertools;
 use rayon::prelude::*;
 use std::ops::{Add, Mul};
@@ -30,28 +31,18 @@ fn equation_possible(
     operands: &[u64],
     possible_ops: &[fn(u64, u64) -> u64],
 ) -> bool {
-    fn helper(
-        test_value: u64,
-        result: u64,
-        operands: &[u64],
-        possible_ops: &[fn(u64, u64) -> u64],
-    ) -> bool {
+    let helper = fix_fn!(|helper, result: u64, operands: &[u64]| -> bool {
         if result > test_value {
             return false;
         } else if operands.is_empty() {
             return result == test_value;
         }
-        possible_ops.iter().any(|op| {
-            helper(
-                test_value,
-                op(result, operands[0]),
-                &operands[1..],
-                possible_ops,
-            )
-        })
-    }
+        possible_ops
+            .iter()
+            .any(|op| helper(op(result, operands[0]), &operands[1..]))
+    });
 
-    helper(test_value, operands[0], &operands[1..], possible_ops)
+    helper(operands[0], &operands[1..])
 }
 
 fn part1(input: &str) -> u64 {
