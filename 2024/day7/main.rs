@@ -31,10 +31,13 @@ fn equation_possible(test_value: u64, items: &[u64], possible_ops: &[fn(u64, u64
         .multi_cartesian_product();
 
     combinations.any(|combination| {
-        let result = combination
-            .iter()
-            .zip(items.iter().skip(1))
-            .fold(items[0], |acc, (op, item)| op(acc, *item));
+        let mut result = items[0];
+        for (op, item) in combination.iter().zip(items.iter().skip(1)) {
+            result = op(result, *item);
+            if result > test_value {
+                return false;
+            }
+        }
         result == test_value
     })
 }
