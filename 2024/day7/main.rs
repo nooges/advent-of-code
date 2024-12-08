@@ -22,7 +22,7 @@ fn parse_input(input: &str) -> Vec<Equation> {
 }
 
 fn concat(a: u64, b: u64) -> u64 {
-    format!("{}{}", a, b).parse().unwrap()
+    a * 10u64.pow(b.ilog10() + 1) + b
 }
 
 fn equation_possible(
