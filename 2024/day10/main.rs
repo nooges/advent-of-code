@@ -1,6 +1,6 @@
 use fxhash::FxHashSet as HashSet;
 use itertools::{iproduct, Itertools};
-use num::{abs, complex::Complex};
+use num::complex::Complex;
 
 #[derive(Debug)]
 struct Grid {
@@ -29,9 +29,7 @@ fn traverse(
     let next_positions = dirs
         .into_iter()
         .map(|(dr, dc)| pos + Complex::new(dr, dc))
-        .filter(|pos| {
-            !traversed.contains(pos) && grid.inbounds(pos) && grid.v(pos) - cur_value == 1
-        })
+        .filter(|p| !traversed.contains(p) && grid.inbounds(p) && grid.v(p) - cur_value == 1)
         .collect_vec();
     if next_positions.is_empty() {
         traversed
@@ -43,6 +41,31 @@ fn traverse(
     }
 }
 
+fn traverse2(grid: &Grid, pos: Complex<i32>, traversed: HashSet<Complex<i32>>) -> u32 {
+    let dirs = vec![(0, 1), (0, -1), (1, 0), (-1, 0)];
+    let cur_value = grid.v(&pos);
+    let next_positions = dirs
+        .into_iter()
+        .map(|(dr, dc)| pos + Complex::new(dr, dc))
+        .filter(|p| !traversed.contains(p) && grid.inbounds(p) && grid.v(p) - cur_value == 1)
+        .collect_vec();
+
+    if next_positions.is_empty() {
+        0
+    } else {
+        let mut new_seen = traversed.clone();
+        new_seen.insert(pos);
+        next_positions
+            .into_iter()
+            .map(|new_pos| {
+                if grid.v(&new_pos) == 9 {
+                    return 1;
+                }
+                traverse2(grid, new_pos, new_seen.clone())
+            })
+            .sum()
+    }
+}
 fn part1(grid: &Grid) -> u32 {
     let trailheads = iproduct!(0..grid.nrows, 0..grid.ncols)
         .map(|(r, c)| Complex::new(r, c))
@@ -64,6 +87,22 @@ fn part1(grid: &Grid) -> u32 {
         .sum()
 }
 
+fn part2(grid: &Grid) -> u32 {
+    let trailheads = iproduct!(0..grid.nrows, 0..grid.ncols)
+        .map(|(r, c)| Complex::new(r, c))
+        .filter(|pos| grid.v(pos) == 0)
+        .collect_vec();
+
+    trailheads
+        .into_iter()
+        .map(|start| {
+            let mut init = HashSet::default();
+            init.insert(start);
+            dbg!(traverse2(grid, start, init))
+        })
+        .sum()
+}
+
 fn main() -> std::io::Result<()> {
     let input = include_str!("input.txt");
     let values = input
@@ -77,6 +116,6 @@ fn main() -> std::io::Result<()> {
     };
 
     aoc2024_utils::timeit("Part 1", || part1(&grid));
-    //aoc2024_utils::timeit("Part 2", || part2(&grid));
+    aoc2024_utils::timeit("Part 2", || part2(&grid));
     Ok(())
 }
