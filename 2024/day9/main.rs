@@ -65,8 +65,12 @@ fn part2(input: &str) -> u64 {
         {
             let update = (files[&id].0, freespace[index].1);
             files.insert(id, update);
-            freespace[index].0 -= files[&id].0;
-            freespace[index].1 += files[&id].0;
+            if freespace[index].0 == *files[&id].0 {
+                freespace.remove(index);
+            } else {
+                freespace[index].0 -= files[&id].0;
+                freespace[index].1 += files[&id].0;
+            }
         }
     });
 
