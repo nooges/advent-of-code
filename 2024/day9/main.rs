@@ -61,7 +61,7 @@ fn part2(input: &str) -> u64 {
     (0..diskmap.len()).rev().for_each(|id| {
         if let Some(index) = freespace
             .iter()
-            .position(|i| i.0 >= *files[&id].0 && i.1 < files[&id].1)
+            .position(|i| i.1 < files[&id].1 && i.0 >= *files[&id].0)
         {
             let update = (files[&id].0, freespace[index].1);
             files.insert(id, update);
