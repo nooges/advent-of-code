@@ -44,28 +44,21 @@ fn traverse(
 fn traverse2(grid: &Grid, pos: Complex<i32>, traversed: HashSet<Complex<i32>>) -> u32 {
     let dirs = vec![(0, 1), (0, -1), (1, 0), (-1, 0)];
     let cur_value = grid.v(&pos);
-    let next_positions = dirs
-        .into_iter()
+    let mut new_seen = traversed.clone();
+    new_seen.insert(pos);
+
+    dirs.into_iter()
         .map(|(dr, dc)| pos + Complex::new(dr, dc))
         .filter(|p| !traversed.contains(p) && grid.inbounds(p) && grid.v(p) - cur_value == 1)
-        .collect_vec();
-
-    if next_positions.is_empty() {
-        0
-    } else {
-        let mut new_seen = traversed.clone();
-        new_seen.insert(pos);
-        next_positions
-            .into_iter()
-            .map(|new_pos| {
-                if grid.v(&new_pos) == 9 {
-                    return 1;
-                }
-                traverse2(grid, new_pos, new_seen.clone())
-            })
-            .sum()
-    }
+        .map(|new_pos| {
+            if grid.v(&new_pos) == 9 {
+                return 1;
+            }
+            traverse2(grid, new_pos, new_seen.clone())
+        })
+        .sum()
 }
+
 fn part1(grid: &Grid) -> u32 {
     let trailheads = iproduct!(0..grid.nrows, 0..grid.ncols)
         .map(|(r, c)| Complex::new(r, c))
@@ -98,7 +91,7 @@ fn part2(grid: &Grid) -> u32 {
         .map(|start| {
             let mut init = HashSet::default();
             init.insert(start);
-            dbg!(traverse2(grid, start, init))
+            traverse2(grid, start, init)
         })
         .sum()
 }
