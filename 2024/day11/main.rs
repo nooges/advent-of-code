@@ -18,7 +18,7 @@ fn solve(input: &str, blinks: u32) -> u64 {
             if *n == 0 {
                 *new_stones.entry(1).or_default() += count;
             } else if num_digits(*n) % 2 == 0 {
-                let m = pow(10, (num_digits(*n) / 2).try_into().unwrap());
+                let m = 10u64.pow(num_digits(*n) / 2);
                 *new_stones.entry(*n / m).or_default() += count;
                 *new_stones.entry(*n % m).or_default() += count;
             } else {
@@ -39,7 +39,7 @@ fn solve_cached(input: &str, blinks: u32) -> u64 {
         } else if n == 0 {
             helper(1, blinks - 1)
         } else if num_digits(n) % 2 == 0 {
-            let m = pow(10, (num_digits(n) / 2).try_into().unwrap());
+            let m = 10u64.pow(num_digits(n) / 2);
             helper(n / m, blinks - 1) + helper(n % m, blinks - 1)
         } else {
             helper(n * 2024, blinks - 1)
