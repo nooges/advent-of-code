@@ -1,6 +1,8 @@
-use cached::proc_macro::cached;
-use fxhash::FxHashMap as HashMap;
+//use cached::proc_macro::cached;
+//use fxhash::FxHashMap as HashMap;
+//use michie::memoized;
 use num::pow;
+use std::collections::HashMap;
 
 fn num_digits(n: u64) -> u32 {
     n.ilog10() + 1
@@ -32,22 +34,27 @@ fn solve(input: &str, blinks: u32) -> u64 {
 }
 
 fn solve_cached(input: &str, blinks: u32) -> u64 {
-    #[cached]
-    fn helper(n: u64, blinks: u32) -> u64 {
-        if blinks == 0 {
+    let mut cache: HashMap<(u64, u32), u64> = HashMap::default();
+    fn helper(n: u64, blinks: u32, cache: &mut HashMap<(u64, u32), u64>) -> u64 {
+        if let Some(c) = cache.get(&(n, blinks)) {
+            return *c;
+        }
+        let result = if blinks == 0 {
             1
         } else if n == 0 {
-            helper(1, blinks - 1)
+            helper(1, blinks - 1, cache)
         } else if num_digits(n) % 2 == 0 {
             let m = pow(10, (num_digits(n) / 2).try_into().unwrap());
-            helper(n / m, blinks - 1) + helper(n % m, blinks - 1)
+            helper(n / m, blinks - 1, cache) + helper(n % m, blinks - 1, cache)
         } else {
-            helper(n * 2024, blinks - 1)
-        }
+            helper(n * 2024, blinks - 1, cache)
+        };
+        cache.insert((n, blinks), result);
+        result
     }
     aoc2024_utils::extract_u64s(input)
         .iter()
-        .map(|n| helper(*n, blinks))
+        .map(|n| helper(*n, blinks, &mut cache))
         .sum()
 }
 
