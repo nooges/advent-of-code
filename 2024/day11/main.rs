@@ -1,0 +1,46 @@
+use fxhash::FxHashMap as HashMap;
+use num::pow;
+
+fn num_digits(n: u64) -> u32 {
+    n.ilog10() + 1
+}
+
+fn solve(input: &str, blinks: u32) -> u64 {
+    let mut stones: HashMap<_, _> = aoc2024_utils::extract_u64s(input)
+        .into_iter()
+        .map(|n| (n, 1))
+        .collect();
+
+    (0..blinks).for_each(|_| {
+        let mut new_stones: HashMap<_, _> = HashMap::default();
+        for (n, count) in &stones {
+            if *n == 0 {
+                *new_stones.entry(1).or_default() += count;
+            } else if num_digits(*n) % 2 == 0 {
+                let m = pow(10, (num_digits(*n) / 2).try_into().unwrap());
+                *new_stones.entry(*n / m).or_default() += count;
+                *new_stones.entry(*n % m).or_default() += count;
+            } else {
+                *new_stones.entry(*n * 2024).or_default() += count;
+            }
+        }
+
+        stones = new_stones;
+    });
+    stones.into_values().sum::<u64>()
+}
+
+fn part1(_input: &str) -> u64 {
+    solve(_input, 25)
+}
+fn part2(_input: &str) -> u64 {
+    solve(_input, 75)
+}
+
+fn main() -> std::io::Result<()> {
+    let input = include_str!("input.txt");
+
+    aoc2024_utils::timeit_u64("Part 1", || part1(input));
+    aoc2024_utils::timeit_u64("Part 2", || part2(input));
+    Ok(())
+}
