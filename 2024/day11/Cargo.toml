@@ -9,6 +9,7 @@ itertools = "0.13.0"
 num = "0.4.0"
 fxhash = "0.2.1"
 rayon = "1.10.0"
+cached = "0.54.0"
 
 [[bin]]
 name = "day11"

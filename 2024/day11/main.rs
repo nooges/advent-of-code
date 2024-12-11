@@ -1,3 +1,4 @@
+use cached::proc_macro::cached;
 use fxhash::FxHashMap as HashMap;
 use num::pow;
 
@@ -30,11 +31,38 @@ fn solve(input: &str, blinks: u32) -> u64 {
     stones.into_values().sum::<u64>()
 }
 
-fn part1(_input: &str) -> u64 {
-    solve(_input, 25)
+fn solve_cached(input: &str, blinks: u32) -> u64 {
+    #[cached]
+    fn helper(n: u64, blinks: u32) -> u64 {
+        if blinks == 0 {
+            1
+        } else if n == 0 {
+            helper(1, blinks - 1)
+        } else if num_digits(n) % 2 == 0 {
+            let m = pow(10, (num_digits(n) / 2).try_into().unwrap());
+            helper(n / m, blinks - 1) + helper(n % m, blinks - 1)
+        } else {
+            helper(n * 2024, blinks - 1)
+        }
+    }
+    aoc2024_utils::extract_u64s(input)
+        .iter()
+        .map(|n| helper(*n, blinks))
+        .sum()
 }
-fn part2(_input: &str) -> u64 {
-    solve(_input, 75)
+
+fn part1(input: &str) -> u64 {
+    solve(input, 25)
+}
+fn part2(input: &str) -> u64 {
+    solve(input, 75)
+}
+
+fn part1_cached(input: &str) -> u64 {
+    solve_cached(input, 25)
+}
+fn part2_cached(input: &str) -> u64 {
+    solve_cached(input, 75)
 }
 
 fn main() -> std::io::Result<()> {
@@ -42,5 +70,8 @@ fn main() -> std::io::Result<()> {
 
     aoc2024_utils::timeit_u64("Part 1", || part1(input));
     aoc2024_utils::timeit_u64("Part 2", || part2(input));
+    println!("(Cached Version)");
+    aoc2024_utils::timeit_u64("Part 1", || part1_cached(input));
+    aoc2024_utils::timeit_u64("Part 2", || part2_cached(input));
     Ok(())
 }
