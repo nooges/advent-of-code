@@ -60,61 +60,59 @@ fn perimeter(region: &HashSet<Complex<i32>>) -> u32 {
             .sum::<u32>()
 }
 
+fn find_edges(positions: HashSet<i32>, max: i32) -> (HashSet<i32>, HashSet<i32>) {
+    let mut starts: HashSet<i32> = HashSet::default();
+    let mut ends: HashSet<i32> = HashSet::default();
+
+    let mut inside = false;
+    for i in 0..max {
+        let has_pos = positions.contains(&i);
+        if has_pos && !inside {
+            starts.insert(i);
+            inside = true;
+        } else if !has_pos && inside {
+            ends.insert(i);
+            inside = false;
+        }
+    }
+    if inside {
+        ends.insert(max);
+    }
+
+    (starts, ends)
+}
+
 fn sides(region: &HashSet<Complex<i32>>, grid: &Grid) -> u32 {
-    // Go through lines horizontally
     let mut num_sides = 0;
 
-    let mut prev_starts: HashSet<i32> = HashSet::default();
-    let mut prev_ends: HashSet<i32> = HashSet::default();
+    let mut prev_edges: (HashSet<i32>, HashSet<i32>) = (HashSet::default(), HashSet::default());
+    // Go through lines horizontally
     for r in 0..grid.nrows {
-        let mut inside = false;
-        let mut cur_starts: HashSet<i32> = HashSet::default();
-        let mut cur_ends: HashSet<i32> = HashSet::default();
-        for c in 0..grid.ncols {
-            let pos = Complex::new(r, c);
-            let has_pos = region.contains(&pos);
-            if inside && !has_pos {
-                inside = false;
-                cur_ends.insert(c);
-            } else if !inside && has_pos {
-                inside = true;
-                cur_starts.insert(c);
-            }
-        }
-        if inside {
-            cur_ends.insert(grid.ncols);
-        }
-        num_sides += cur_starts.difference(&prev_starts).count() as u32;
-        num_sides += cur_ends.difference(&prev_ends).count() as u32;
-        prev_starts = cur_starts;
-        prev_ends = cur_ends;
+        let line = region
+            .iter()
+            .filter(|pos| pos.re == r)
+            .map(|pos| pos.im)
+            .collect();
+        let edges = find_edges(line, grid.ncols);
+
+        num_sides += edges.0.difference(&prev_edges.0).count() as u32;
+        num_sides += edges.1.difference(&prev_edges.1).count() as u32;
+        prev_edges = edges;
     }
 
     // Go through lines vertically
-    prev_starts = HashSet::default();
-    prev_ends = HashSet::default();
+    prev_edges = (HashSet::default(), HashSet::default());
     for c in 0..grid.ncols {
-        let mut inside = false;
-        let mut cur_starts: HashSet<i32> = HashSet::default();
-        let mut cur_ends: HashSet<i32> = HashSet::default();
-        for r in 0..grid.nrows {
-            let pos = Complex::new(r, c);
-            let has_pos = region.contains(&pos);
-            if inside && !has_pos {
-                inside = false;
-                cur_ends.insert(r);
-            } else if !inside && has_pos {
-                inside = true;
-                cur_starts.insert(r);
-            }
-        }
-        if inside {
-            cur_ends.insert(grid.nrows);
-        }
-        num_sides += cur_starts.difference(&prev_starts).count() as u32;
-        num_sides += cur_ends.difference(&prev_ends).count() as u32;
-        prev_starts = cur_starts;
-        prev_ends = cur_ends;
+        let line = region
+            .iter()
+            .filter(|pos| pos.im == c)
+            .map(|pos| pos.re)
+            .collect();
+        let edges = find_edges(line, grid.nrows);
+
+        num_sides += edges.0.difference(&prev_edges.0).count() as u32;
+        num_sides += edges.1.difference(&prev_edges.1).count() as u32;
+        prev_edges = edges;
     }
 
     num_sides
