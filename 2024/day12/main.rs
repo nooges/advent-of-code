@@ -86,7 +86,7 @@ fn sides(region: &HashSet<Complex<i32>>, grid: &Grid) -> u32 {
     let mut num_sides = 0;
 
     let mut prev_edges: (HashSet<i32>, HashSet<i32>) = (HashSet::default(), HashSet::default());
-    // Go through lines horizontally
+    // Find vertical sides
     for r in 0..grid.nrows {
         let line = region
             .iter()
@@ -95,12 +95,12 @@ fn sides(region: &HashSet<Complex<i32>>, grid: &Grid) -> u32 {
             .collect();
         let edges = find_edges(line, grid.ncols);
 
-        num_sides += edges.0.difference(&prev_edges.0).count() as u32;
-        num_sides += edges.1.difference(&prev_edges.1).count() as u32;
+        num_sides += edges.0.difference(&prev_edges.0).count();
+        num_sides += edges.1.difference(&prev_edges.1).count();
         prev_edges = edges;
     }
 
-    // Go through lines vertically
+    // Find horizontal sides
     prev_edges = (HashSet::default(), HashSet::default());
     for c in 0..grid.ncols {
         let line = region
@@ -110,12 +110,12 @@ fn sides(region: &HashSet<Complex<i32>>, grid: &Grid) -> u32 {
             .collect();
         let edges = find_edges(line, grid.nrows);
 
-        num_sides += edges.0.difference(&prev_edges.0).count() as u32;
-        num_sides += edges.1.difference(&prev_edges.1).count() as u32;
+        num_sides += edges.0.difference(&prev_edges.0).count();
+        num_sides += edges.1.difference(&prev_edges.1).count();
         prev_edges = edges;
     }
 
-    num_sides
+    num_sides as u32
 }
 
 fn find_regions(grid: &Grid) -> Vec<HashSet<Complex<i32>>> {
@@ -127,7 +127,7 @@ fn find_regions(grid: &Grid) -> Vec<HashSet<Complex<i32>>> {
     while let Some(&start) = points_to_check.iter().next() {
         let mut visited = HashSet::default();
         visited.insert(start);
-        let region = traverse(&grid, start, visited);
+        let region = traverse(grid, start, visited);
         regions.push(region.clone());
         points_to_check.retain(|p| !region.contains(p));
     }
@@ -144,7 +144,7 @@ fn part1(grid: &Grid) -> u32 {
 fn part2(grid: &Grid) -> u32 {
     find_regions(grid)
         .iter()
-        .map(|region| sides(region, &grid) * region.len() as u32)
+        .map(|region| sides(region, grid) * region.len() as u32)
         .sum()
 }
 
