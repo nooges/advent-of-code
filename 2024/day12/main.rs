@@ -62,12 +62,6 @@ fn perimeter(region: &HashSet<Complex<i32>>) -> u32 {
 
 fn sides(region: &HashSet<Complex<i32>>, grid: &Grid) -> u32 {
     // Go through lines horizontally
-    // For each line:
-    // - let inside = false
-    // - if point is in region and prev was outside, set inside = true, track point
-    // - if point is not region and prev was inside, set inside = false, track point
-    // - if end of lines and inside, add end point
-    // - save off points
     let mut num_sides = 0;
 
     let mut prev_starts: HashSet<i32> = HashSet::default();
@@ -95,11 +89,6 @@ fn sides(region: &HashSet<Complex<i32>>, grid: &Grid) -> u32 {
         prev_starts = cur_starts;
         prev_ends = cur_ends;
     }
-    //println!("num vert sides: {}", num_sides);
-
-    // For each collected group:
-    // - num sides = (num_ends + num_start)
-    // - find diff between starts and ends -> num new sides
 
     // Go through lines vertically
     prev_starts = HashSet::default();
@@ -131,15 +120,7 @@ fn sides(region: &HashSet<Complex<i32>>, grid: &Grid) -> u32 {
     num_sides
 }
 
-fn part1(input: &str) -> u32 {
-    let values = input.lines().map(|l| l.as_bytes().to_vec()).collect_vec();
-    let grid = Grid {
-        values: values.clone(),
-        nrows: values.len() as i32,
-        ncols: values[0].len() as i32,
-    };
-
-    // Generate all possible start points to check
+fn find_regions(grid: &Grid) -> Vec<HashSet<Complex<i32>>> {
     let mut points_to_check: HashSet<Complex<i32>> = iproduct!(0..grid.nrows, 0..grid.ncols)
         .map(|(r, c)| Complex::new(r, c))
         .collect();
@@ -152,8 +133,18 @@ fn part1(input: &str) -> u32 {
         regions.push(region.clone());
         points_to_check.retain(|p| !region.contains(p));
     }
-
     regions
+}
+
+fn part1(input: &str) -> u32 {
+    let values = input.lines().map(|l| l.as_bytes().to_vec()).collect_vec();
+    let grid = Grid {
+        values: values.clone(),
+        nrows: values.len() as i32,
+        ncols: values[0].len() as i32,
+    };
+
+    find_regions(&grid)
         .iter()
         .map(|region| perimeter(region) * region.len() as u32)
         .sum()
@@ -167,29 +158,7 @@ fn part2(input: &str) -> u32 {
         ncols: values[0].len() as i32,
     };
 
-    // Generate all possible start points to check
-    let mut points_to_check: HashSet<Complex<i32>> = iproduct!(0..grid.nrows, 0..grid.ncols)
-        .map(|(r, c)| Complex::new(r, c))
-        .collect();
-
-    let mut regions = Vec::new();
-    while let Some(&start) = points_to_check.iter().next() {
-        let mut visited = HashSet::default();
-        visited.insert(start);
-        let region = traverse(&grid, start, visited);
-        regions.push(region.clone());
-        points_to_check.retain(|p| !region.contains(p));
-    }
-
-    for region in &regions {
-        println!(
-            "{}: {}",
-            char::from(grid.get(region.iter().next().unwrap()).unwrap()),
-            sides(region, &grid)
-        );
-    }
-
-    regions
+    find_regions(&grid)
         .iter()
         .map(|region| sides(region, &grid) * region.len() as u32)
         .sum()
