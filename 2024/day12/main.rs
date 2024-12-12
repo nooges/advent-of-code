@@ -52,6 +52,14 @@ fn num_neighbors(pos: &Complex<i32>, region: &HashSet<Complex<i32>>) -> u32 {
         .count() as u32
 }
 
+fn perimeter(region: &HashSet<Complex<i32>>) -> u32 {
+    4 * region.len() as u32
+        - region
+            .iter()
+            .map(|pos| num_neighbors(pos, region))
+            .sum::<u32>()
+}
+
 fn part1(input: &str) -> u32 {
     let values = input.lines().map(|l| l.as_bytes().to_vec()).collect_vec();
     let grid = Grid {
@@ -71,21 +79,12 @@ fn part1(input: &str) -> u32 {
         visited.insert(start);
         let region = traverse(&grid, start, visited);
         regions.push(region.clone());
-        //points_to_check = points_to_check.difference(&region).copied().collect();
         points_to_check.retain(|p| !region.contains(p));
     }
 
-    // For each region, count number of neighbors and do (4*points - neighbors)
     regions
         .iter()
-        .map(|region| {
-            let perimeter = 4 * region.len() as u32
-                - region
-                    .iter()
-                    .map(|pos| num_neighbors(pos, region))
-                    .sum::<u32>();
-            perimeter * region.len() as u32
-        })
+        .map(|region| perimeter(region) * region.len() as u32)
         .sum()
 }
 
