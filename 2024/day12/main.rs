@@ -53,11 +53,10 @@ fn num_neighbors(pos: &Complex<i32>, region: &HashSet<Complex<i32>>) -> u32 {
 }
 
 fn perimeter(region: &HashSet<Complex<i32>>) -> u32 {
-    4 * region.len() as u32
-        - region
-            .iter()
-            .map(|pos| num_neighbors(pos, region))
-            .sum::<u32>()
+    region
+        .iter()
+        .map(|pos| 4 - num_neighbors(pos, region))
+        .sum::<u32>()
 }
 
 fn find_edges(positions: HashSet<i32>, max: i32) -> (HashSet<i32>, HashSet<i32>) {
