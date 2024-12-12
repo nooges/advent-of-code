@@ -87,11 +87,7 @@ fn sides(region: &HashSet<Complex<i32>>, grid: &Grid) -> u32 {
     let mut prev_edges: (HashSet<i32>, HashSet<i32>) = (HashSet::default(), HashSet::default());
     // Find vertical sides
     for r in 0..grid.nrows {
-        let line = region
-            .iter()
-            .filter(|pos| pos.re == r)
-            .map(|pos| pos.im)
-            .collect();
+        let line = region.iter().filter(|p| p.re == r).map(|p| p.im).collect();
         let edges = find_edges(line, grid.ncols);
 
         num_sides += edges.0.difference(&prev_edges.0).count();
@@ -102,11 +98,7 @@ fn sides(region: &HashSet<Complex<i32>>, grid: &Grid) -> u32 {
     // Find horizontal sides
     prev_edges = (HashSet::default(), HashSet::default());
     for c in 0..grid.ncols {
-        let line = region
-            .iter()
-            .filter(|pos| pos.im == c)
-            .map(|pos| pos.re)
-            .collect();
+        let line = region.iter().filter(|p| p.im == c).map(|p| p.re).collect();
         let edges = find_edges(line, grid.nrows);
 
         num_sides += edges.0.difference(&prev_edges.0).count();
