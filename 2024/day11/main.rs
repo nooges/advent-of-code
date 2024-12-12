@@ -1,5 +1,5 @@
 use cached::proc_macro::cached;
-use fxhash::FxHashMap as HashMap;
+use rustc_hash::FxHashMap as HashMap;
 
 fn num_digits(n: u64) -> u32 {
     n.ilog10() + 1

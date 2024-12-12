@@ -1,4 +1,4 @@
-use fxhash::FxHashSet;
+use rustc_hash::FxHashSet;
 use itertools::Itertools;
 
 fn page_lt(a: &str, b: &str, rules: &FxHashSet<&str>) -> bool {

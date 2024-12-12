@@ -1,7 +1,7 @@
-use fxhash::FxHashSet as HashSet;
 use itertools::{iproduct, Itertools};
 use num::complex::Complex;
 use rayon::prelude::*;
+use rustc_hash::FxHashSet as HashSet;
 
 #[derive(Clone)]
 struct Grid {

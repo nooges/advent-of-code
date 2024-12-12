@@ -1,5 +1,5 @@
-use fxhash::FxHashMap as HashMap;
 use itertools::Itertools;
+use rustc_hash::FxHashMap as HashMap;
 
 fn part1(input: &str) -> u64 {
     let mut disk: Vec<i64> = Vec::with_capacity(100000);

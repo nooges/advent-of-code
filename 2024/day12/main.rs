@@ -1,4 +1,4 @@
-use fxhash::FxHashSet as HashSet;
+use rustc_hash::FxHashSet as HashSet;
 use itertools::{iproduct, Itertools};
 use num::complex::Complex;
 

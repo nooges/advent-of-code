@@ -1,5 +1,5 @@
-use fxhash::FxHashMap as HashMap;
-use fxhash::FxHashSet as HashSet;
+use rustc_hash::FxHashMap as HashMap;
+use rustc_hash::FxHashSet as HashSet;
 use itertools::{iproduct, Itertools};
 use num::complex::Complex;
 
