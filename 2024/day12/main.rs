@@ -136,29 +136,15 @@ fn find_regions(grid: &Grid) -> Vec<HashSet<Complex<i32>>> {
     regions
 }
 
-fn part1(input: &str) -> u32 {
-    let values = input.lines().map(|l| l.as_bytes().to_vec()).collect_vec();
-    let grid = Grid {
-        values: values.clone(),
-        nrows: values.len() as i32,
-        ncols: values[0].len() as i32,
-    };
-
-    find_regions(&grid)
+fn part1(grid: &Grid) -> u32 {
+    find_regions(grid)
         .iter()
         .map(|region| perimeter(region) * region.len() as u32)
         .sum()
 }
 
-fn part2(input: &str) -> u32 {
-    let values = input.lines().map(|l| l.as_bytes().to_vec()).collect_vec();
-    let grid = Grid {
-        values: values.clone(),
-        nrows: values.len() as i32,
-        ncols: values[0].len() as i32,
-    };
-
-    find_regions(&grid)
+fn part2(grid: &Grid) -> u32 {
+    find_regions(grid)
         .iter()
         .map(|region| sides(region, &grid) * region.len() as u32)
         .sum()
@@ -166,8 +152,14 @@ fn part2(input: &str) -> u32 {
 
 fn main() -> std::io::Result<()> {
     let input = include_str!("input.txt");
+    let values = input.lines().map(|l| l.as_bytes().to_vec()).collect_vec();
+    let grid = Grid {
+        values: values.clone(),
+        nrows: values.len() as i32,
+        ncols: values[0].len() as i32,
+    };
 
-    aoc2024_utils::timeit("Part 1", || part1(input));
-    aoc2024_utils::timeit("Part 2", || part2(input));
+    aoc2024_utils::timeit("Part 1", || part1(&grid));
+    aoc2024_utils::timeit("Part 2", || part2(&grid));
     Ok(())
 }
