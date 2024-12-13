@@ -1,0 +1,15 @@
+[package]
+name = "aoc2024_day13"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+aoc2024_utils = { path = "../utils" }
+itertools = "0.13.0"
+num = "0.4.0"
+rustc-hash = "2.1.0"
+faer = "0.19.4"
+
+[[bin]]
+name = "day13"
+path = "main.rs"
