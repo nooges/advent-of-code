@@ -107,15 +107,13 @@ fn part1(input: &str) -> u32 {
             (_, Some((sp, 1)), _) => {
                 bot_pos = sp;
             }
-            (Some((wp, wd)), Some((sp, sd)), Some((bp, 1))) => {
+            (Some((_, wd)), Some((sp, sd)), Some((bp, 1))) => {
                 // There's space, so push boxes
                 if sd < wd {
                     grid.set(&bp, '.');
                     grid.set(&sp, 'O');
                     bot_pos = bp;
-                    // Swap space with box
                 }
-                // Else, there's a wall, bot can't move
             }
             _ => {
                 println!("Unreachable");

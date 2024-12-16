@@ -83,9 +83,12 @@ fn part2(input: &str, size: Complex<i32>) -> u32 {
             .map(|r| final_pos(r, time, size))
             .collect_vec();
 
+        // Check if there's a line with a bunch of consecutive points in a row
+
         // Check if line 33 has a bunch of consecutive points in a row
         if (21..40).all(|y| cur_pos.contains(&Complex::new(33, y))) {
             print_points(&cur_pos, size);
+            println!("Time: {}", time);
             return time as u32;
         }
         time += 1;
