@@ -4,7 +4,6 @@ use petgraph::algo::astar;
 use petgraph::graph::NodeIndex;
 use petgraph::{Graph, Undirected};
 use rustc_hash::FxHashMap as HashMap;
-use rustc_hash::FxHashSet as HashSet;
 
 #[derive(Debug)]
 struct GridRC {
@@ -132,7 +131,7 @@ fn part1(input: &str) -> u32 {
 }
 
 fn part2(input: &str) -> u32 {
-    let (grid, start, end) = parse(input);
+    let (mut grid, start, end) = parse(input);
     let (graph, nodes) = setup_graph(&grid);
 
     let best_path = find_best_path(&graph, &nodes, start, end);
@@ -161,6 +160,14 @@ fn part2(input: &str) -> u32 {
         }
         i += 1;
     }
+
+    best_nodes
+        .iter()
+        .map(|n| graph.node_weight(*n).unwrap().0)
+        .unique()
+        .for_each(|p| grid.set(&p, 'O'));
+    grid.print();
+
     // Remove overlapping nodes (i.e. horizontal and vertical at same position)
     best_nodes
         .iter()
