@@ -1,7 +1,8 @@
 use itertools::{iproduct, Itertools};
 use num::complex::Complex;
 use petgraph::algo::astar;
-use petgraph::Graph;
+use petgraph::graph::NodeIndex;
+use petgraph::{Graph, Undirected};
 use rustc_hash::FxHashMap as HashMap;
 use rustc_hash::FxHashSet as HashSet;
 
@@ -40,13 +41,6 @@ impl GridRC {
         }
         Complex::new(-1, -1)
     }
-
-    fn find_all(&self, ch: char) -> HashSet<Complex<i32>> {
-        iproduct!(0..self.nrows as usize, 0..self.ncols as usize)
-            .filter(|&(r, c)| self.values[r][c] == ch)
-            .map(|(r, c)| Complex::new(r as i32, c as i32))
-            .collect()
-    }
 }
 
 fn parse(input: &str) -> (GridRC, Complex<i32>, Complex<i32>) {
@@ -67,60 +61,16 @@ fn parse(input: &str) -> (GridRC, Complex<i32>, Complex<i32>) {
     (grid, start, end)
 }
 
-fn part1(input: &str) -> u32 {
-    let (grid, start, end) = parse(input);
+fn setup_graph(
+    grid: &GridRC,
+) -> (
+    Graph<(Complex<i32>, char), u32, Undirected>,
+    HashMap<(Complex<i32>, char), NodeIndex>,
+) {
     let mut graph = Graph::new_undirected();
 
     // Create horizontal and vertical nodes
-    let mut nodes: HashMap<(Complex<i32>, char), petgraph::prelude::NodeIndex> = HashMap::default();
-    for (r, c) in iproduct!(0..grid.nrows, 0..grid.ncols) {
-        let pos = Complex::new(r, c);
-        if grid.get(&pos) == Some('#') {
-            continue;
-        }
-        let hnode = graph.add_node((pos, 'h'));
-        let vnode = graph.add_node((pos, 'v'));
-        nodes.insert((pos, 'h'), hnode);
-        nodes.insert((pos, 'v'), vnode);
-        // Add "rotation" edge
-        graph.add_edge(hnode, vnode, 1000);
-    }
-
-    // Add edges between neighbors
-    for (r, c) in iproduct!(0..grid.nrows, 0..grid.ncols) {
-        let pos = Complex::new(r, c);
-        if grid.get(&pos) == Some('#') {
-            continue;
-        }
-
-        let pos_right = pos + Complex::new(0, 1);
-        if grid.get(&pos_right) != Some('#') {
-            graph.add_edge(nodes[&(pos, 'h')], nodes[&(pos_right, 'h')], 1);
-        }
-        let pos_down = pos + Complex::new(1, 0);
-        if grid.get(&pos_down) != Some('#') {
-            graph.add_edge(nodes[&(pos, 'v')], nodes[&(pos_down, 'v')], 1);
-        }
-    }
-
-    let goal_nodes = [nodes[&(end, 'h')], nodes[&(end, 'v')]];
-    let path = astar(
-        &graph,
-        nodes[&(start, 'h')],
-        |n| goal_nodes.contains(&n),
-        |e| *e.weight(),
-        |_| 0,
-    );
-
-    path.unwrap().0
-}
-
-fn part2(input: &str) -> u32 {
-    let (grid, start, end) = parse(input);
-    let mut graph = Graph::new_undirected();
-
-    // Create horizontal and vertical nodes
-    let mut nodes: HashMap<(Complex<i32>, char), petgraph::prelude::NodeIndex> = HashMap::default();
+    let mut nodes: HashMap<(Complex<i32>, char), NodeIndex> = HashMap::default();
     for (r, c) in iproduct!(0..grid.nrows, 0..grid.ncols) {
         let pos = Complex::new(r, c);
         if grid.get(&pos) == Some('#') {
@@ -155,20 +105,38 @@ fn part2(input: &str) -> u32 {
         }
     }
 
+    (graph, nodes)
+}
+
+fn find_best_path(
+    graph: &Graph<(Complex<i32>, char), u32, Undirected>,
+    nodes: &HashMap<(Complex<i32>, char), NodeIndex>,
+    start: Complex<i32>,
+    end: Complex<i32>,
+) -> Option<(u32, Vec<NodeIndex>)> {
     let goal_nodes = [nodes[&(end, 'h')], nodes[&(end, 'v')]];
-    let best_path = astar(
+    astar(
         &graph,
         nodes[&(start, 'h')],
         |n| goal_nodes.contains(&n),
         |e| *e.weight(),
         |_| 0,
-    );
+    )
+}
 
-    let best = best_path.unwrap();
-    let min_path_len = best.0;
-    let mut best_nodes = Vec::new();
-    best.1.iter().for_each(|n| best_nodes.push(*n));
-    //let mut best_nodes = &best.unwrap().1.clone();
+fn part1(input: &str) -> u32 {
+    let (grid, start, end) = parse(input);
+    let (graph, nodes) = setup_graph(&grid);
+
+    find_best_path(&graph, &nodes, start, end).unwrap().0
+}
+
+fn part2(input: &str) -> u32 {
+    let (grid, start, end) = parse(input);
+    let (graph, nodes) = setup_graph(&grid);
+
+    let best_path = find_best_path(&graph, &nodes, start, end);
+    let (min_path_len, mut best_nodes) = best_path.unwrap();
     let mut i = 0;
 
     // Save off nodes on the best path into a mutable vector
@@ -177,18 +145,11 @@ fn part2(input: &str) -> u32 {
     while i < best_nodes.len() {
         let mut test_graph = graph.clone();
         test_graph.remove_node(best_nodes[i]);
-        //let best_set: HashSet<_> = best_nodes.iter().cloned().collect();
-        let test_path = astar(
-            &test_graph,
-            nodes[&(start, 'h')],
-            |n| goal_nodes.contains(&n),
-            |e| *e.weight(),
-            |_| 0,
-        );
-        match &test_path {
+        let test_path = find_best_path(&test_graph, &nodes, start, end);
+        match test_path {
             None => (),
             Some((len, test_path_nodes)) => {
-                if *len == min_path_len {
+                if len == min_path_len {
                     let mut new_best_nodes = best_nodes.clone();
                     test_path_nodes
                         .iter()
@@ -200,7 +161,7 @@ fn part2(input: &str) -> u32 {
         }
         i += 1;
     }
-    // Take the nodes and remove overlapping ones
+    // Remove overlapping nodes (i.e. horizontal and vertical at same position)
     best_nodes
         .iter()
         .map(|n| graph.node_weight(*n).unwrap().0)
@@ -209,7 +170,7 @@ fn part2(input: &str) -> u32 {
 }
 
 fn main() -> std::io::Result<()> {
-    let input = include_str!("sample.txt");
+    let input = include_str!("input.txt");
 
     aoc2024_utils::timeit("Part 1", || part1(input));
     aoc2024_utils::timeit("Part 2", || part2(input));
