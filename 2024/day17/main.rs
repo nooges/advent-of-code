@@ -118,7 +118,7 @@ fn part2(input: &str) -> u64 {
             }
             init_a += 1 << (oct_digit * 3);
         }
-        println!("Found digit: {:#o}", init_a);
+        println!("Found output match: {:#o}", init_a);
         if oct_digit == 0 {
             break;
         }
