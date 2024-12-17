@@ -2,38 +2,41 @@ use itertools::Itertools;
 
 #[derive(Debug, Clone)]
 struct Computer {
-    a: u32,
-    b: u32,
-    c: u32,
-    program: Vec<u32>,
+    a: u64,
+    b: u64,
+    c: u64,
+    program: Vec<u64>,
     ptr: usize,
-    output: Vec<u32>,
+    output: Vec<u64>,
 }
 
-fn parse(input: &str) -> Computer {
+fn parse(input: &str) -> (Computer, &str) {
     let (register_str, program_str) = input.split_once("\n\n").unwrap();
     let register_data = register_str
         .lines()
-        .map(|l| aoc2024_utils::extract_u32s(l)[0])
+        .map(|l| aoc2024_utils::extract_u64s(l)[0])
         .collect_vec();
-    let program = aoc2024_utils::extract_u32s(program_str);
+    let program = aoc2024_utils::extract_u64s(program_str);
 
-    Computer {
-        a: register_data[0],
-        b: register_data[1],
-        c: register_data[2],
-        program,
-        ptr: 0,
-        output: Vec::new(),
-    }
+    (
+        Computer {
+            a: register_data[0],
+            b: register_data[1],
+            c: register_data[2],
+            program,
+            ptr: 0,
+            output: Vec::new(),
+        },
+        program_str.split_once(" ").unwrap().1,
+    )
 }
 
-fn dv(numerator: u32, operand: u32) -> u32 {
-    let denominator = 2u32.pow(operand);
+fn dv(numerator: u64, operand: u64) -> u64 {
+    let denominator = 2u64.pow(operand as u32);
     numerator / denominator
 }
 
-fn combo_operand(c: &Computer, operand: u32) -> u32 {
+fn combo_operand(c: &Computer, operand: u64) -> u64 {
     match operand {
         4 => c.a,
         5 => c.b,
@@ -83,32 +86,45 @@ fn process_instruction(c: &mut Computer) {
     }
 }
 
-fn part1(input: &str) -> u32 {
-    let mut computer = parse(input);
-    dbg!(&computer);
-    while computer.ptr < computer.program.len() {
-        process_instruction(&mut computer);
-        dbg!(&computer);
+fn program_output(c: &Computer) -> String {
+    let mut new = c.clone();
+    while new.ptr < new.program.len() {
+        process_instruction(&mut new);
     }
-    dbg!(computer.output.into_iter().map(|n| n.to_string()).join(","));
+    new.output.iter().map(|n| n.to_string()).join(",")
+}
+
+fn part1(input: &str) -> u32 {
+    let (computer, _) = parse(input);
+    dbg!(program_output(&computer));
     0
 }
 
-fn part2(input: &str) -> u32 {
-    let mut computer = parse(input);
-    dbg!(&computer);
-    while computer.ptr < computer.program.len() {
-        process_instruction(&mut computer);
-        dbg!(&computer);
+fn part2(input: &str) -> u64 {
+    let (computer, program_str) = parse(input);
+    let init = 0o5325644676236000;
+    let mut init_a = init;
+    let mut i = 0;
+    loop {
+        let mut test = computer.clone();
+        test.a = init_a;
+        let output = program_output(&test);
+        println!("{:#o}: {}", init_a, output);
+        init_a += 1 << (0 * 3);
+        i += 1;
+        if i == 1 << 12 {
+            return 0;
+        }
+        if output == program_str {
+            return init_a;
+        }
     }
-    dbg!(computer.output.into_iter().map(|n| n.to_string()).join(","));
-    0
 }
 
 fn main() -> std::io::Result<()> {
     let input = include_str!("input.txt");
 
     aoc2024_utils::timeit("Part 1", || part1(input));
-    //aoc2024_utils::timeit("Part 2", || part2(input));
+    aoc2024_utils::timeit_u64("Part 2", || part2(input));
     Ok(())
 }
