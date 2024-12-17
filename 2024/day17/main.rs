@@ -83,15 +83,7 @@ fn process_instruction(c: &mut Computer) {
     }
 }
 
-fn program_output(c: &Computer) -> String {
-    let mut new = c.clone();
-    while new.ptr < new.program.len() {
-        process_instruction(&mut new);
-    }
-    new.output.iter().map(|n| n.to_string()).join(",")
-}
-
-fn program_output_vec(c: &Computer) -> Vec<u64> {
+fn program_output(c: &Computer) -> Vec<u64> {
     let mut new = c.clone();
     while new.ptr < new.program.len() {
         process_instruction(&mut new);
@@ -99,10 +91,12 @@ fn program_output_vec(c: &Computer) -> Vec<u64> {
     new.output
 }
 
-fn part1(input: &str) -> u32 {
+fn part1(input: &str) -> String {
     let computer = parse(input);
-    dbg!(program_output(&computer));
-    0
+    program_output(&computer)
+        .into_iter()
+        .map(|n| n.to_string())
+        .join(",")
 }
 
 fn part2(input: &str) -> u64 {
@@ -117,7 +111,7 @@ fn part2(input: &str) -> u64 {
             let mut test = computer.clone();
             total_checks += 1;
             test.a = init_a;
-            let output = program_output_vec(&test);
+            let output = program_output(&test);
             //println!("{:#o}: {:?}", init_a, output);
             if output[oct_digit..16] == computer.program[oct_digit..16] {
                 break;
@@ -137,7 +131,7 @@ fn part2(input: &str) -> u64 {
 fn main() -> std::io::Result<()> {
     let input = include_str!("input.txt");
 
-    aoc2024_utils::timeit("Part 1", || part1(input));
+    aoc2024_utils::timeit_str("Part 1", || part1(input));
     aoc2024_utils::timeit_u64("Part 2", || part2(input));
     Ok(())
 }
