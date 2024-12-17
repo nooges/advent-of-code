@@ -48,33 +48,17 @@ fn process_instruction(c: &mut Computer) {
     let mut jump = false;
 
     match opcode {
-        0 => {
-            c.a = dv(c.a, combo_operand(c, operand));
+        0 => c.a = dv(c.a, combo_operand(c, operand)),
+        1 => c.b ^= operand,
+        2 => c.b = combo_operand(c, operand) & 7,
+        3 if c.a != 0 => {
+            c.ptr = operand as usize;
+            jump = true;
         }
-        1 => {
-            c.b ^= operand;
-        }
-        2 => {
-            c.b = combo_operand(c, operand) & 7;
-        }
-        3 => {
-            if c.a != 0 {
-                c.ptr = operand as usize;
-                jump = true;
-            }
-        }
-        4 => {
-            c.b ^= c.c;
-        }
-        5 => {
-            c.output.push(combo_operand(c, operand) & 7);
-        }
-        6 => {
-            c.b = dv(c.a, combo_operand(c, operand));
-        }
-        7 => {
-            c.c = dv(c.a, combo_operand(c, operand));
-        }
+        4 => c.b ^= c.c,
+        5 => c.output.push(combo_operand(c, operand) & 7),
+        6 => c.b = dv(c.a, combo_operand(c, operand)),
+        7 => c.c = dv(c.a, combo_operand(c, operand)),
         _ => (),
     }
 
