@@ -28,11 +28,6 @@ fn parse(input: &str) -> Computer {
     }
 }
 
-fn dv(numerator: u64, operand: u64) -> u64 {
-    let denominator = 2u64.pow(operand as u32);
-    numerator / denominator
-}
-
 fn combo_operand(c: &Computer, operand: u64) -> u64 {
     match operand {
         4 => c.a,
@@ -45,26 +40,22 @@ fn combo_operand(c: &Computer, operand: u64) -> u64 {
 fn process_instruction(c: &mut Computer) {
     let opcode = c.program[c.ptr];
     let operand = c.program[c.ptr + 1];
-    let mut jump = false;
 
     match opcode {
-        0 => c.a = dv(c.a, combo_operand(c, operand)),
+        0 => c.a >>= combo_operand(c, operand),
         1 => c.b ^= operand,
         2 => c.b = combo_operand(c, operand) & 7,
         3 if c.a != 0 => {
             c.ptr = operand as usize;
-            jump = true;
+            return;
         }
         4 => c.b ^= c.c,
         5 => c.output.push(combo_operand(c, operand) & 7),
-        6 => c.b = dv(c.a, combo_operand(c, operand)),
-        7 => c.c = dv(c.a, combo_operand(c, operand)),
+        6 => c.b = c.a >> combo_operand(c, operand),
+        7 => c.c = c.a >> combo_operand(c, operand),
         _ => (),
     }
-
-    if !jump {
-        c.ptr += 2;
-    }
+    c.ptr += 2;
 }
 
 fn program_output(c: &Computer) -> Vec<u64> {
