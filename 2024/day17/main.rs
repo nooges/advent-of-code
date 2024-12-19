@@ -37,6 +37,7 @@ fn combo_operand(c: &Computer, operand: u64) -> u64 {
         _ => operand,
     }
 }
+
 fn process_instruction(c: &mut Computer) {
     let opcode = c.program[c.ptr];
     let operand = c.program[c.ptr + 1];
