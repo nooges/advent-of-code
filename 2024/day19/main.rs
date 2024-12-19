@@ -15,13 +15,9 @@ fn num_possibilities(design: &str, patterns: &HashSet<&str>) -> u64 {
     if design.is_empty() {
         return 1;
     }
-    let possible_prefixes = &patterns
+    patterns
         .iter()
         .filter(|p| design.starts_with(**p))
-        .collect_vec();
-
-    possible_prefixes
-        .iter()
         .map(|d| num_possibilities(&design[d.len()..], patterns))
         .sum()
 }
