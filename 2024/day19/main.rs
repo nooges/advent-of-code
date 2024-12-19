@@ -4,14 +4,8 @@ use rustc_hash::FxHashSet as HashSet;
 
 fn parse(input: &str) -> (HashSet<&str>, Vec<&str>) {
     let (patterns_str, designs_str) = input.split_once("\n\n").unwrap();
-    let patterns = HashSet::from_iter(
-        patterns_str
-            .split(", ")
-            .sorted_by(|a, b| b.len().cmp(&a.len())),
-    );
+    let patterns = HashSet::from_iter(patterns_str.split(", "));
     let designs = designs_str.lines().collect_vec();
-
-    println!("Patterns: {patterns:?}");
 
     (patterns, designs)
 }
@@ -32,11 +26,11 @@ fn num_possibilities(design: &str, patterns: &HashSet<&str>) -> u64 {
         .sum()
 }
 
-fn part1(patterns: HashSet<&str>, designs: Vec<&str>) -> u64 {
+fn part1(patterns: HashSet<&str>, designs: Vec<&str>) -> u32 {
     designs
         .iter()
-        .filter(|design| dbg!(num_possibilities(design, &patterns)) > 0)
-        .count() as u64
+        .filter(|design| num_possibilities(design, &patterns) > 0)
+        .count() as u32
 }
 
 fn part2(patterns: HashSet<&str>, designs: Vec<&str>) -> u64 {
@@ -50,7 +44,7 @@ fn main() -> std::io::Result<()> {
     let input = include_str!("input.txt");
     let (patterns, designs) = parse(input);
 
-    aoc2024_utils::timeit_u64("Part 1", || part1(patterns.clone(), designs.clone()));
+    aoc2024_utils::timeit("Part 1", || part1(patterns.clone(), designs.clone()));
     aoc2024_utils::timeit_u64("Part 2", || part2(patterns.clone(), designs.clone()));
     Ok(())
 }
