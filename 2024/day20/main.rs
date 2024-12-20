@@ -113,11 +113,7 @@ fn part1(input: &str) -> u32 {
 
     // Run dijkstra from start to end
     let node_distances = dijkstra(&graph, nodes[&start], Some(nodes[&end]), |_| 1);
-    dbg!(&node_distances);
-
-    // Save off shortest path length
-    let shortest_len = &node_distances.get(&nodes[&end]).unwrap();
-    dbg!(shortest_len);
+    //dbg!(&node_distances);
 
     // For each wall point, if U/D neighbor or L/R neighbor is not wall, calcuate difference of the node distances
     let walls = grid.find_chars('#');
@@ -132,8 +128,6 @@ fn part1(input: &str) -> u32 {
             if c1 != '#' && c2 != '#' {
                 let d1 = node_distances.get(&nodes[&left]).unwrap();
                 let d2 = node_distances.get(&nodes[&right]).unwrap();
-                println!("{wall}: {}", abs(d1 - d2) - 2);
-                //println!("{}", abs(d1 - d2) - 2);
                 if (abs(d1 - d2) - 2) >= 100 {
                     num_good_cheats += 1;
                 }
@@ -143,8 +137,7 @@ fn part1(input: &str) -> u32 {
             if c1 != '#' && c2 != '#' {
                 let d1 = node_distances.get(&nodes[&up]).unwrap();
                 let d2 = node_distances.get(&nodes[&down]).unwrap();
-                println!("{wall}: {}", abs(d1 - d2) - 2);
-                //println!("{}", abs(d1 - d2) - 2);
+
                 if (abs(d1 - d2) - 2) >= 100 {
                     num_good_cheats += 1;
                 }
