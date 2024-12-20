@@ -3,7 +3,7 @@ use num::abs;
 use num::complex::Complex;
 use petgraph::algo::dijkstra;
 use petgraph::graph::NodeIndex;
-use petgraph::{Graph, Undirected};
+use petgraph::{Directed, Graph, Undirected};
 use rustc_hash::FxHashMap as HashMap;
 
 #[derive(Debug)]
@@ -148,10 +148,105 @@ fn part1(input: &str) -> u32 {
     num_good_cheats
 }
 
+const DIRS: [Complex<i32>; 4] = [
+    Complex::new(0, 1),
+    Complex::new(0, -1),
+    Complex::new(1, 0),
+    Complex::new(-1, 0),
+];
+
+fn setup_cheat_graph(
+    grid: &GridRC,
+    levels: u32,
+) -> (
+    Graph<(Complex<i32>, u32), u32, Directed>,
+    HashMap<(Complex<i32>, u32), NodeIndex>,
+) {
+    let mut graph: Graph<(Complex<i32>, u32), u32, Directed> = Graph::new();
+    let mut nodes: HashMap<(Complex<i32>, u32), NodeIndex> = HashMap::default();
+
+    // Add nodes
+    for (r, c) in iproduct!(0..grid.nrows, 0..grid.ncols) {
+        let pos = Complex::new(r, c);
+        (0..levels + 1).for_each(|l| {
+            nodes.insert((pos, l), graph.add_node((pos, l)));
+        });
+    }
+
+    // Add edges between neighbors
+    for (r, c) in iproduct!(0..grid.nrows, 0..grid.ncols) {
+        let pos = Complex::new(r, c);
+
+        // Create wall-less middle levels
+        (0..levels - 1).for_each(|level| {
+            DIRS.iter().map(|d| pos + d).for_each(|p| {
+                if grid.get(&p).is_some() {
+                    graph.add_edge(nodes[&(pos, level)], nodes[&(p, level + 1)], 1);
+                }
+            });
+        });
+
+        if grid.get(&pos) == Some('#') {
+            continue;
+        }
+
+        // Add free hop to top level if there's no wall to end a cheat
+        (0..levels).for_each(|level| {
+            graph.add_edge(nodes[&(pos, level)], nodes[&(pos, levels)], 0);
+        });
+
+        // Add edges for bottom level and top level
+        DIRS.iter().map(|d| pos + d).for_each(|p| {
+            if grid.get(&p) != Some('#') {
+                graph.add_edge(nodes[&(pos, 0)], nodes[&(p, 0)], 1);
+                graph.add_edge(nodes[&(pos, levels)], nodes[&(p, levels)], 1);
+            }
+        });
+    }
+
+    (graph, nodes)
+}
+
+fn part2(input: &str) -> u32 {
+    let (grid, start, end) = parse(input);
+    let (graph, nodes) = setup_graph(&grid);
+    let levels = 2;
+    let (cheat_graph, cheat_nodes) = setup_cheat_graph(&grid, levels);
+
+    // Run dijkstra from start to end
+    let original_node_distances =
+        dijkstra(&graph, nodes[&start], Some(nodes[&end]), |e| *e.weight());
+
+    // Make new graph with multiple levels to allow cheating
+    let cheat_node_distances = dijkstra(
+        &cheat_graph,
+        cheat_nodes[&(start, 0)],
+        Some(cheat_nodes[&(end, levels)]),
+        |e| *e.weight(),
+    );
+
+    // Compare to original node distances
+    let mut points = grid.find_chars('.');
+    points.push(start);
+    points.push(end);
+
+    let mut num_good_cheats = 0;
+    for pos in points {
+        let d1: u32 = *(original_node_distances.get(&nodes[&pos]).unwrap());
+        let d2: u32 = *(cheat_node_distances.get(&cheat_nodes[&(pos, 0)]).unwrap());
+        println!("{pos}: {d1} {d2}");
+        if d1.abs_diff(d2) >= 1 {
+            println!("{}: {}", pos, d1.abs_diff(d2));
+            num_good_cheats += 1;
+        }
+    }
+
+    num_good_cheats
+}
 fn main() -> std::io::Result<()> {
-    let input = include_str!("input.txt");
+    let input = include_str!("sample.txt");
 
     aoc2024_utils::timeit("Part 1", || part1(input));
-    //aoc2024_utils::timeit("Part 2", || part2(input));
+    aoc2024_utils::timeit("Part 2", || part2(input));
     Ok(())
 }
