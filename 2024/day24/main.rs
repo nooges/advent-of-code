@@ -55,30 +55,48 @@ fn parse(input: &str) -> (HashMap<String, u64>, Vec<Gate>) {
     (init_wires, gates)
 }
 
-fn part1(input: &str) -> u64 {
-    let (mut wires, mut gates) = parse(input);
+fn get_value(wires: &HashMap<String, u64>, prefix: &str) -> u64 {
+    wires
+        .iter()
+        .filter(|(wire, _)| wire.starts_with(prefix))
+        .map(|(wire, val)| *val << wire.split(prefix).last().unwrap().parse::<u32>().unwrap())
+        .sum()
+}
+
+fn test_gates(wires: HashMap<String, u64>, gates: Vec<Gate>) -> (u64, u64, u64) {
+    let mut wires = wires;
+    let mut gates = gates;
+
     loop {
         for gate in &mut gates {
             if !gate.solved {
                 if let Some(output) = gate.output(wires.clone()) {
-                    &wires.insert(gate.out.clone(), output);
+                    let _ = &wires.insert(gate.out.clone(), output);
                     gate.solved = true;
                 }
             }
         }
 
         let num_left = gates.iter().filter(|g| !g.solved).count();
-        //dbg!(num_left);
         if num_left == 0 {
             break;
         }
     }
-    // Form z value
-    wires
-        .iter()
-        .filter(|(wire, _)| wire.starts_with("z"))
-        .map(|(wire, val)| *val << wire.split("z").last().unwrap().parse::<u32>().unwrap())
-        .sum()
+    (
+        get_value(&wires, "x"),
+        get_value(&wires, "y"),
+        get_value(&wires, "z"),
+    )
+}
+
+fn part1(input: &str) -> u64 {
+    let (wires, gates) = parse(input);
+    let (_, _, z) = test_gates(wires, gates);
+    z
+}
+
+fn part2(input: &str) -> u64 {
+    0
 }
 
 fn main() -> std::io::Result<()> {
