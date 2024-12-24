@@ -10,7 +10,15 @@ fn next_secret(n: u64) -> u64 {
     ((next << 11) ^ next) & 0xFFFFFF
 }
 
-fn sequence_prices(n: u64) -> HashMap<VecDeque<i64>, u64> {
+fn index(seq: &VecDeque<i64>) -> usize {
+    let mut index = 0;
+    for i in 0..seq.len() {
+        index += (seq[i] + 9) * 19i64.pow(i as u32);
+    }
+    index as usize
+}
+
+fn sequence_prices(n: u64) -> HashMap<usize, u64> {
     // Generate price change sequence and associated price for a 4-number sequence
     let mut seq_prices = HashMap::default();
     let mut i = 0;
@@ -20,8 +28,9 @@ fn sequence_prices(n: u64) -> HashMap<VecDeque<i64>, u64> {
         let next = next_secret(prev);
         deque.push_back((next % 10) as i64 - (prev % 10) as i64);
         if deque.len() == 4 {
-            if !seq_prices.contains_key(&deque) {
-                seq_prices.insert(deque.clone(), next % 10);
+            let idx = index(&deque);
+            if !seq_prices.contains_key(&idx) {
+                seq_prices.insert(idx, next % 10);
             }
             deque.pop_front();
         }
