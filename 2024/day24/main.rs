@@ -63,7 +63,7 @@ fn get_value(wires: &HashMap<String, u64>, prefix: &str) -> u64 {
         .sum()
 }
 
-fn test_gates(wires: HashMap<String, u64>, gates: Vec<Gate>) -> (u64, u64, u64) {
+fn test_gates(wires: HashMap<String, u64>, gates: Vec<Gate>) -> u64 {
     let mut wires = wires;
     let mut gates = gates;
 
@@ -82,27 +82,37 @@ fn test_gates(wires: HashMap<String, u64>, gates: Vec<Gate>) -> (u64, u64, u64) 
             break;
         }
     }
-    (
-        get_value(&wires, "x"),
-        get_value(&wires, "y"),
-        get_value(&wires, "z"),
-    )
+    get_value(&wires, "z")
 }
 
 fn part1(input: &str) -> u64 {
     let (wires, gates) = parse(input);
-    let (_, _, z) = test_gates(wires, gates);
-    z
+    test_gates(wires, gates)
 }
 
 fn part2(input: &str) -> u64 {
+    let (_, gates) = parse(input);
+
+    // Set x/y values and populate wires
+    let num_bits = 45;
+    let x = 0x555555555555;
+    let y = 0x555555555555;
+
+    let mut wires: HashMap<String, u64> = HashMap::default();
+    for i in 0..num_bits {
+        wires.insert(format!("x{:02}", i), (x >> i) & 1);
+        wires.insert(format!("y{:02}", i), (y >> i) & 1);
+    }
+    let z = test_gates(wires, gates);
+    println!("0x{:x}", z);
+    println!("0b{}", format!("{:b}", z));
     0
 }
 
 fn main() -> std::io::Result<()> {
-    let input = include_str!("input.txt");
+    let input = include_str!("input2.txt");
 
-    aoc2024_utils::timeit_u64("Part 1", || part1(input));
-    //aoc2024_utils::timeit_u64("Part 2", || part2(input));
+    //aoc2024_utils::timeit_u64("Part 1", || part1(input));
+    aoc2024_utils::timeit_u64("Part 2", || part2(input));
     Ok(())
 }
