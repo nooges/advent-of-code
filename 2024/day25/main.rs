@@ -1,27 +1,19 @@
 use itertools::Itertools;
 
-fn process_lock(block: &str) -> Vec<usize> {
+fn process_block(block: &str, is_lock: bool) -> Vec<usize> {
     (0..5)
         .map(|c| {
-            for r in 0..5 {
-                if block.chars().nth(6 * (r + 1) + c).unwrap() == '.' {
-                    return r;
+            let rows = if is_lock {
+                (1..6).collect_vec()
+            } else {
+                (1..6).rev().collect_vec()
+            };
+            for (i, r) in rows.iter().enumerate() {
+                if block.chars().nth(6 * r + c).unwrap() == '.' {
+                    return i;
                 }
             }
             5
-        })
-        .collect_vec()
-}
-
-fn process_key(block: &str) -> Vec<usize> {
-    (0..5)
-        .map(|c| {
-            for r in 0..5 {
-                if block.chars().nth(6 * (r + 1) + c).unwrap() == '#' {
-                    return 5 - r;
-                }
-            }
-            0
         })
         .collect_vec()
 }
@@ -31,9 +23,9 @@ fn parse(input: &str) -> (Vec<Vec<usize>>, Vec<Vec<usize>>) {
     let mut keys = Vec::new();
     input.split("\n\n").for_each(|block| {
         if block.starts_with("#") {
-            locks.push(process_lock(block));
+            locks.push(process_block(block, true));
         } else {
-            keys.push(process_key(block));
+            keys.push(process_block(block, false))
         }
     });
     (locks, keys)
