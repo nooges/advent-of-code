@@ -89,6 +89,43 @@ fn parse(input: &str) -> (GridRC, Complex<i32>, Vec<Complex<i32>>) {
     (grid, start, commands)
 }
 
+fn parse_wide(input: &str) -> (GridRC, Complex<i32>, Vec<Complex<i32>>) {
+    let (grid_str, cmd_str) = input.split_once("\n\n").unwrap();
+    let grid_lines = grid_str.lines().collect_vec();
+    let nrows = grid_lines.len() as i32;
+    let ncols = grid_lines[0].len() as i32;
+    let grid = GridRC {
+        values: grid_lines
+            .iter()
+            .map(|l| {
+                l.chars()
+                    .flat_map(|c| match c {
+                        '#' => "##".chars().collect_vec(),
+                        'O' => "[]".chars().collect_vec(),
+                        '@' => "@.".chars().collect_vec(),
+                        _ => "..".chars().collect_vec(),
+                    })
+                    .collect_vec()
+            })
+            .collect_vec(),
+        nrows,
+        ncols,
+    };
+    let p = grid
+        .values
+        .iter()
+        .flatten()
+        .position(|c| *c == '@')
+        .unwrap();
+    let start = Complex::new(p as i32 / ncols, p as i32 % ncols);
+
+    let commands = cmd_str
+        .chars()
+        .filter_map(|c| dirs().get(&c).copied())
+        .collect_vec();
+    (grid, start, commands)
+}
+
 fn part1(input: &str) -> u32 {
     let (mut grid, start, commands) = parse(input);
     grid.print();
@@ -116,7 +153,7 @@ fn part1(input: &str) -> u32 {
                 }
             }
             _ => {
-                println!("Unreachable");
+                //println!("Unreachable");
             }
         }
 
@@ -130,10 +167,18 @@ fn part1(input: &str) -> u32 {
         .sum::<i32>() as u32
 }
 
+fn part2(input: &str) -> u32 {
+    let (mut grid, start, commands) = parse_wide(input);
+    grid.print();
+    grid.set(&start, '.');
+
+    0
+}
+
 fn main() -> std::io::Result<()> {
-    let input = include_str!("input.txt");
+    let input = include_str!("sample2.txt");
 
     aoc2024_utils::timeit("Part 1", || part1(input));
-    //aoc2024_utils::timeit("Part 2", || part2(input, size));
+    aoc2024_utils::timeit("Part 2", || part2(input));
     Ok(())
 }
