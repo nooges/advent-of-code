@@ -18,7 +18,7 @@ fn process_block(block: &str, is_lock: bool) -> Vec<usize> {
         .collect_vec()
 }
 
-fn parse(input: &str) -> (Vec<Vec<usize>>, Vec<Vec<usize>>) {
+fn part1(input: &str) -> u32 {
     let mut locks = Vec::new();
     let mut keys = Vec::new();
     input.split("\n\n").for_each(|block| {
@@ -28,11 +28,6 @@ fn parse(input: &str) -> (Vec<Vec<usize>>, Vec<Vec<usize>>) {
             keys.push(process_block(block, false))
         }
     });
-    (locks, keys)
-}
-
-fn part1(input: &str) -> u32 {
-    let (locks, keys) = parse(input);
     locks
         .iter()
         .map(|lock| {
