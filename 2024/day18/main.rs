@@ -49,6 +49,24 @@ fn bfs(
     None
 }
 
+fn binary_search(low: usize, high: usize, points: &[Complex<i32>], max_xy: i32) -> Option<usize> {
+    let mut low = low;
+    let mut high = high;
+    let mut first_match = None;
+    let start = Complex::new(0, 0);
+    let end = Complex::new(max_xy, max_xy);
+    while low <= high {
+        let mid = (low + high) / 2;
+        if bfs(&points[..mid], max_xy, start, end).is_none() {
+            first_match = Some(mid);
+            high = mid - 1;
+        } else {
+            low = mid + 1;
+        }
+    }
+    first_match
+}
+
 fn part1(input: &str, max_xy: i32, load: usize) -> u32 {
     let points = parse(input);
     let start = Complex::new(0, 0);
@@ -58,16 +76,9 @@ fn part1(input: &str, max_xy: i32, load: usize) -> u32 {
 
 fn part2(input: &str, max_xy: i32, initial_load: usize) -> String {
     let points = parse(input);
-    let start = Complex::new(0, 0);
-    let end = Complex::new(max_xy, max_xy);
-    for num_points in (initial_load..points.len()) {
-        println!("Trying {} points", num_points);
-        if bfs(&points[..num_points], max_xy, start, end).is_none() {
-            let p = points[num_points - 1];
-            return format!("{},{}", p.re, p.im);
-        }
-    }
-    "Not found".to_string()
+    let res = binary_search(initial_load, points.len(), &points, max_xy).unwrap();
+    let p = points[res - 1];
+    format!("{},{}", p.re, p.im)
 }
 
 fn main() -> std::io::Result<()> {
