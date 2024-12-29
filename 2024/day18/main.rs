@@ -24,13 +24,18 @@ fn inbounds(pos: &Complex<i32>, max_xy: i32) -> bool {
     pos.re >= 0 && pos.re <= max_xy && pos.im >= 0 && pos.im <= max_xy
 }
 
-fn bfs(points: &[Complex<i32>], max_xy: i32, start: Complex<i32>, end: Complex<i32>) -> u32 {
+fn bfs(
+    points: &[Complex<i32>],
+    max_xy: i32,
+    start: Complex<i32>,
+    end: Complex<i32>,
+) -> Option<u32> {
     let mut queue = VecDeque::new();
     let mut seen = HashSet::default();
     queue.push_back((start, 0));
     while let Some((pos, dist)) = queue.pop_front() {
         if pos == end {
-            return dist;
+            return Some(dist);
         }
         for dir in DIRS {
             let new_pos = pos + dir;
@@ -41,19 +46,28 @@ fn bfs(points: &[Complex<i32>], max_xy: i32, start: Complex<i32>, end: Complex<i
             }
         }
     }
-    unreachable!()
-}
-
-fn shortest_path_len(points: &[Complex<i32>], max_xy: i32) -> u32 {
-    let start = Complex::new(0, 0);
-    let end = Complex::new(max_xy, max_xy);
-    bfs(points, max_xy, start, end)
+    None
 }
 
 fn part1(input: &str, max_xy: i32, load: usize) -> u32 {
     let points = parse(input);
-    dbg!(&points[..load]);
-    shortest_path_len(&points[..load], max_xy)
+    let start = Complex::new(0, 0);
+    let end = Complex::new(max_xy, max_xy);
+    bfs(&points[..load], max_xy, start, end).unwrap()
+}
+
+fn part2(input: &str, max_xy: i32, initial_load: usize) -> String {
+    let points = parse(input);
+    let start = Complex::new(0, 0);
+    let end = Complex::new(max_xy, max_xy);
+    for num_points in (initial_load..points.len()) {
+        println!("Trying {} points", num_points);
+        if bfs(&points[..num_points], max_xy, start, end).is_none() {
+            let p = points[num_points - 1];
+            return format!("{},{}", p.re, p.im);
+        }
+    }
+    "Not found".to_string()
 }
 
 fn main() -> std::io::Result<()> {
@@ -61,6 +75,6 @@ fn main() -> std::io::Result<()> {
     let (input, max_xy, load) = (include_str!("input.txt"), 70, 1024);
 
     aoc2024_utils::timeit("Part 1", || part1(input, max_xy, load));
-    //aoc2024_utils::timeit("Part 2", || part2(input));
+    aoc2024_utils::timeit_str("Part 2", || part2(input, max_xy, load));
     Ok(())
 }
