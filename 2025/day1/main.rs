@@ -16,12 +16,15 @@ fn parse_input(input: &str) -> Vec<i32> {
 fn part1(input: &str) -> u32 {
     let data = parse_input(input);
     data.iter()
-        .scan(50, |acc, v| {
-            *acc = (*acc + v + 100) % 100;
-            Some(*acc)
+        .fold((50, 0), |(pos, acc), v| {
+            let new_pos = (pos + v + 100) % 100;
+            if new_pos == 0 {
+                (new_pos, acc + 1)
+            } else {
+                (new_pos, acc)
+            }
         })
-        .filter(|v| *v == 0)
-        .count() as u32
+        .1
 }
 
 fn main() -> std::io::Result<()> {
