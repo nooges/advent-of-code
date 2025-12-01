@@ -1,0 +1,32 @@
+fn parse_input(input: &str) -> Vec<i32> {
+    input
+        .lines()
+        .map(|l| {
+            let p = l.split_at(1);
+            let v: i32 = p.1.parse().unwrap();
+            if p.0 == "L" {
+                -v
+            } else {
+                v
+            }
+        })
+        .collect()
+}
+
+fn part1(input: &str) -> u32 {
+    let data = parse_input(input);
+    data.iter()
+        .scan(50, |acc, v| {
+            *acc = (*acc + v + 100) % 100;
+            Some(*acc)
+        })
+        .filter(|v| *v == 0)
+        .count() as u32
+}
+
+fn main() -> std::io::Result<()> {
+    let input = include_str!("input.txt");
+
+    aoc2025_utils::timeit("Part 1", || part1(input));
+    Ok(())
+}
