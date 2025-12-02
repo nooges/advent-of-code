@@ -24,12 +24,10 @@ fn part1(input: &str) -> u64 {
 }
 
 fn repeat_digits(n: u64, repeats: usize) -> Option<u64> {
-    let s = n.to_string().repeat(repeats);
-    if s.len() > 10 {
-        None
-    } else {
-        Some(s.parse().unwrap())
+    if num_digits(n) * repeats as u32 > 10 {
+        return None;
     }
+    Some(n.to_string().repeat(repeats).parse().unwrap())
 }
 
 fn part2(input: &str) -> u64 {
