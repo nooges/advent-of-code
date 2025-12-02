@@ -23,10 +23,11 @@ fn part1(input: &str) -> u64 {
 }
 
 fn repeat_digits(n: u64, repeats: usize) -> Option<u64> {
-    if num_digits(n) * repeats as u32 > 10 {
+    let len = num_digits(n);
+    if len * repeats as u32 > 10 {
         return None;
     }
-    Some(n.to_string().repeat(repeats).parse().unwrap())
+    Some((1..repeats).fold(n, |acc, i| acc + 10_u64.pow(len * i as u32) * n))
 }
 
 fn part2(input: &str) -> u64 {
