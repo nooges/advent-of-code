@@ -5,7 +5,6 @@ fn parse_input(input: &str) -> Vec<(u64, u64)> {
         .split(',')
         .map(|s| {
             let p = s.split_once('-').unwrap();
-            println!("{:?}", p);
             (p.0.parse().unwrap(), p.1.parse().unwrap())
         })
         .collect()
