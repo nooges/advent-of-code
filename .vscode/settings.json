@@ -1,6 +1,6 @@
 {
     "FSharp.inlayHints.typeAnnotations": false,
     "code-runner.executorMap": {
-        "rust": "cd $dir && cargo run -r",
-      }
+        "rust": "cd $dir && /Users/danny/.cargo/bin/cargo run -r",
+    }
 }
