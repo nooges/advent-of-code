@@ -1,3 +1,5 @@
+use itertools::Itertools;
+
 fn parse_input(input: &str) -> Vec<(u64, u64)> {
     input
         .split(',')
@@ -21,10 +23,29 @@ fn part1(input: &str) -> u64 {
         .sum()
 }
 
+fn repeat_digits(n: u64, repeats: usize) -> Option<u64> {
+    let s = n.to_string().repeat(repeats);
+    if s.len() > 10 {
+        None
+    } else {
+        Some(s.parse().unwrap())
+    }
+}
+
+fn part2(input: &str) -> u64 {
+    let ranges = parse_input(input);
+    let possible_bad_ids =
+        (1..=99999).flat_map(|n| (2..=10).flat_map(move |r| repeat_digits(n, r)));
+    possible_bad_ids
+        .filter(|i| ranges.iter().any(|(start, end)| i >= start && i <= end))
+        .unique()
+        .sum()
+}
+
 fn main() -> std::io::Result<()> {
-    let input = include_str!("sample.txt");
+    let input = include_str!("input.txt");
 
     aoc2025_utils::timeit_u64("Part 1", || part1(input));
-    //aoc2025_utils::timeit("Part 2", || part2(input));
+    aoc2025_utils::timeit_u64("Part 2", || part2(input));
     Ok(())
 }
