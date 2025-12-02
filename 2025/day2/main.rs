@@ -31,8 +31,7 @@ fn repeat_digits(n: u64, repeats: usize) -> Option<u64> {
 
 fn part2(input: &str) -> u64 {
     let ranges = parse_input(input);
-    let possible_bad_ids =
-        (1..=99999).flat_map(|n| (2..=10).flat_map(move |r| repeat_digits(n, r)));
+    let possible_bad_ids = (1..=99999).flat_map(|n| (2..=7).flat_map(move |r| repeat_digits(n, r)));
     possible_bad_ids
         .filter(|i| ranges.iter().any(|(start, end)| i >= start && i <= end))
         .unique()
