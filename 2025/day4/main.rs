@@ -26,10 +26,16 @@ fn parse_input(input: &str) -> HashSet<Complex<i32>> {
 }
 
 fn removable(p: Complex<i32>, points: &HashSet<Complex<i32>>) -> bool {
-    DIRS.iter()
-        .filter_map(|d| points.contains(&(d + p)).then_some(()))
-        .count()
-        < 4
+    let mut cnt = 0;
+    for d in DIRS.iter() {
+        if points.contains(&(d + p)) {
+            cnt += 1;
+            if cnt >= 4 {
+                return false;
+            }
+        }
+    }
+    true
 }
 
 fn part1(input: &str) -> u32 {
