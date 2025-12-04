@@ -25,7 +25,7 @@ fn parse_input(input: &str) -> Vec<Complex<i32>> {
         .collect_vec()
 }
 
-fn around_roll(p: Complex<i32>, points: &Vec<Complex<i32>>) -> usize {
+fn around_roll(p: Complex<i32>, points: &[Complex<i32>]) -> usize {
     DIRS.iter()
         .filter_map(|d| points.contains(&(d + p)).then_some(()))
         .count()
@@ -39,15 +39,33 @@ fn part1(input: &str) -> u32 {
         .count() as u32
 }
 
+fn remove_rolls(points: &[Complex<i32>]) -> Vec<Complex<i32>> {
+    points
+        .iter()
+        .copied()
+        .filter(|p| around_roll(*p, points) >= 4)
+        .collect_vec()
+}
+
 fn part2(input: &str) -> u32 {
-    let points = parse_input(input);
-    0
+    let mut points = parse_input(input);
+    let num_rolls = points.len();
+
+    // Cycle through removing rolls until points stay the same
+    loop {
+        let new_points = remove_rolls(&points);
+        println!("{} -> {}", points.len(), new_points.len());
+        if new_points.len() == points.len() {
+            return num_rolls as u32 - new_points.len() as u32;
+        }
+        points = new_points;
+    }
 }
 
 fn main() -> std::io::Result<()> {
-    let input = include_str!("sample.txt");
+    let input = include_str!("input.txt");
 
     aoc2025_utils::timeit("Part 1", || part1(input));
-    //aoc2025_utils::timeit("Part 2", || part2(input));
+    aoc2025_utils::timeit("Part 2", || part2(input));
     Ok(())
 }
