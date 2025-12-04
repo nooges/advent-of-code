@@ -25,7 +25,7 @@ fn parse_input(input: &str) -> HashSet<Complex<i32>> {
         .collect()
 }
 
-fn removable(p: Complex<i32>, points: HashSet<Complex<i32>>) -> bool {
+fn removable(p: Complex<i32>, points: &HashSet<Complex<i32>>) -> bool {
     DIRS.iter()
         .filter_map(|d| points.contains(&(d + p)).then_some(()))
         .count()
@@ -36,15 +36,15 @@ fn part1(input: &str) -> u32 {
     let points = parse_input(input);
     points
         .iter()
-        .filter_map(|p| removable(*p, points.clone()).then_some(()))
+        .filter_map(|p| removable(*p, &points).then_some(()))
         .count() as u32
 }
 
-fn remove_rolls(points: HashSet<Complex<i32>>) -> HashSet<Complex<i32>> {
+fn remove_rolls(points: &HashSet<Complex<i32>>) -> HashSet<Complex<i32>> {
     points
         .iter()
         .copied()
-        .filter(|p| !removable(*p, points.clone()))
+        .filter(|p| !removable(*p, points))
         .collect()
 }
 
@@ -54,7 +54,7 @@ fn part2(input: &str) -> u32 {
 
     // Cycle through removing rolls until points stay the same
     loop {
-        let new_points = remove_rolls(points.clone());
+        let new_points = remove_rolls(&points);
         println!("{} -> {}", points.len(), new_points.len());
         if new_points.len() == points.len() {
             return num_rolls as u32 - new_points.len() as u32;
