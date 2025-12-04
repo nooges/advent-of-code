@@ -4,8 +4,6 @@ use num::complex::Complex;
 #[derive(Debug)]
 struct GridPoints {
     points: Vec<Complex<i32>>,
-    nrows: i32,
-    ncols: i32,
 }
 
 const DIRS: [Complex<i32>; 8] = [
@@ -20,12 +18,9 @@ const DIRS: [Complex<i32>; 8] = [
 ];
 
 fn parse_input(input: &str) -> GridPoints {
-    let grid_lines = input.lines().collect_vec();
-    let nrows = grid_lines.len() as i32;
-    let ncols = grid_lines[0].len() as i32;
-    let grid = GridPoints {
-        points: grid_lines
-            .iter()
+    GridPoints {
+        points: input
+            .lines()
             .enumerate()
             .flat_map(|(r, l)| {
                 l.chars().enumerate().filter_map(move |(c, v)| match v {
@@ -34,11 +29,7 @@ fn parse_input(input: &str) -> GridPoints {
                 })
             })
             .collect_vec(),
-        nrows,
-        ncols,
-    };
-
-    grid
+    }
 }
 
 fn around_roll(p: Complex<i32>, grid: &GridPoints) -> usize {
@@ -61,7 +52,7 @@ fn part2(input: &str) -> u32 {
 }
 
 fn main() -> std::io::Result<()> {
-    let input = include_str!("input.txt");
+    let input = include_str!("sample.txt");
 
     aoc2025_utils::timeit("Part 1", || part1(input));
     //aoc2025_utils::timeit("Part 2", || part2(input));
