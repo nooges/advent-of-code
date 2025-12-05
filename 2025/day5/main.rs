@@ -27,7 +27,7 @@ fn part2(input: &str) -> u64 {
     let mut i = 1;
     let mut a = ranges[0];
     let mut sum = 0;
-    loop {
+    while i < ranges.len() {
         let b = ranges[i];
         // Ranges overlap
         if a.1 >= b.0 {
@@ -40,12 +40,8 @@ fn part2(input: &str) -> u64 {
             a = b;
         }
         i += 1;
-        if i >= ranges.len() {
-            sum += a.1 - a.0 + 1;
-            break;
-        }
     }
-    sum
+    sum + a.1 - a.0 + 1
 }
 
 fn main() -> std::io::Result<()> {
