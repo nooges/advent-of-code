@@ -24,23 +24,17 @@ fn part1(input: &str) -> u32 {
 fn part2(input: &str) -> u64 {
     let (ranges, _) = parse_input(input);
 
-    let mut i = 1;
-    let mut a = ranges[0];
-    let mut sum = 0;
-    while i < ranges.len() {
-        let b = ranges[i];
-        // Ranges overlap
+    let (sum, a) = ranges[1..].iter().fold((0, ranges[0]), |(acc, a), b| {
         if a.1 >= b.0 {
-            // Merge if b is not fully contained in a, else drop b
             if a.1 < b.1 {
-                a = (a.0, b.1);
+                (acc, (a.0, b.1)) // partial overlap
+            } else {
+                (acc, a) // b is fully contained in a
             }
         } else {
-            sum += a.1 - a.0 + 1;
-            a = b;
+            (acc + a.1 - a.0 + 1, *b) // no overlap
         }
-        i += 1;
-    }
+    });
     sum + a.1 - a.0 + 1
 }
 
