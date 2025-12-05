@@ -23,14 +23,15 @@ fn part1(input: &str) -> u32 {
 
 fn part2(input: &str) -> u64 {
     let (ranges, _) = parse_input(input);
-    println!("{ranges:?}");
 
     let mut i = 1;
     let mut a = ranges[0];
     let mut sum = 0;
     loop {
         let b = ranges[i];
+        // Ranges overlap
         if a.1 >= b.0 {
+            // Merge if b is not fully contained in a, else drop b
             if a.1 < b.1 {
                 a = (a.0, b.1);
             }
@@ -39,7 +40,6 @@ fn part2(input: &str) -> u64 {
             a = b;
         }
         i += 1;
-        println!("i: {i}");
         if i >= ranges.len() {
             sum += a.1 - a.0 + 1;
             break;
