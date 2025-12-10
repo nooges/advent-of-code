@@ -1,4 +1,5 @@
 use bitvec::prelude::*;
+use good_lp::{constraint, default_solver, variable, variables, Expression, Solution, SolverModel};
 use itertools::Itertools;
 use regex::Regex;
 
@@ -68,26 +69,43 @@ fn fewest_presses_indicator(machine: &Machine) -> u64 {
 }
 
 fn fewest_presses_joltage(machine: &Machine) -> u64 {
-    println!("{:?}", machine.joltages);
-    let mut presses = 1;
-    loop {
-        if machine
-            .buttons
-            .iter()
-            .combinations_with_replacement(presses)
-            .any(|c| {
-                let mut counters = vec![0; machine.joltages.len()];
-                c.iter().for_each(|button| {
-                    button.iter().for_each(|i| counters[*i as usize] += 1);
-                });
-                counters == machine.joltages
-            })
-        {
-            println!("{}", presses);
-            return presses as u64;
-        }
-        presses += 1;
-    }
+    let num_cols = machine.buttons.len();
+    let mut A = vec![vec![0; machine.buttons.len()]; machine.joltages.len()];
+    machine.buttons.iter().enumerate().for_each(|(c, b)| {
+        b.iter().for_each(|r| {
+            A[*r as usize][c] = 1;
+        });
+    });
+
+    let upper_bound = 1000;
+
+    let mut vars = variables!();
+    let x: Vec<_> = (0..num_cols)
+        .map(|_| vars.add(variable().integer().min(0).max(upper_bound)))
+        .collect();
+
+    let objective: Expression = x.iter().cloned().sum();
+
+    let constraints: Vec<_> = A
+        .iter()
+        .zip(machine.joltages.iter())
+        .map(|(row, &rhs)| {
+            let expr: Expression = row
+                .iter()
+                .zip(x.iter())
+                .map(|(&a, &xi)| a as f64 * xi)
+                .sum();
+            constraint!(expr == rhs as f64)
+        })
+        .collect();
+
+    let problem = vars
+        .minimise(objective.clone())
+        .using(default_solver)
+        .with_all(constraints);
+
+    let solution = problem.solve().unwrap();
+    solution.eval(&objective) as u64
 }
 
 fn part1(input: &str) -> u64 {
