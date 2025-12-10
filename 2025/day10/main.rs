@@ -1,6 +1,6 @@
 use bitvec::prelude::*;
 use good_lp::microlp;
-use good_lp::{constraint, default_solver, variable, variables, Expression, Solution, SolverModel};
+use good_lp::{constraint, variable, variables, Expression, Solution, SolverModel};
 use itertools::Itertools;
 use regex::Regex;
 
@@ -70,14 +70,12 @@ fn fewest_presses_indicator(machine: &Machine) -> u64 {
 }
 
 fn fewest_presses_joltage(machine: &Machine) -> u64 {
-    let upper_bound = 1000;
-
     let mut vars = variables!();
     let x: Vec<_> = (0..machine.buttons.len())
-        .map(|_| vars.add(variable().integer().min(0).max(upper_bound)))
+        .map(|_| vars.add(variable().integer().min(0).max(1000)))
         .collect();
 
-    let objective: Expression = x.iter().cloned().sum();
+    let objective: Expression = x.iter().sum();
 
     let constraints: Vec<_> = machine
         .joltages
