@@ -115,11 +115,7 @@ fn part1(input: &str) -> u64 {
 
 fn part2(input: &str) -> u64 {
     let machines = parse_input(input);
-    machines
-        .iter()
-        .sorted_by_key(|m| m.joltages.len())
-        .map(fewest_presses_joltage)
-        .sum()
+    machines.iter().map(fewest_presses_joltage).sum()
 }
 
 fn main() -> std::io::Result<()> {
