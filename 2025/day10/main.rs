@@ -1,4 +1,5 @@
 use bitvec::prelude::*;
+use good_lp::microlp;
 use good_lp::{constraint, default_solver, variable, variables, Expression, Solution, SolverModel};
 use itertools::Itertools;
 use regex::Regex;
@@ -101,7 +102,7 @@ fn fewest_presses_joltage(machine: &Machine) -> u64 {
 
     let problem = vars
         .minimise(objective.clone())
-        .using(default_solver)
+        .using(microlp)
         .with_all(constraints);
 
     let solution = problem.solve().unwrap();

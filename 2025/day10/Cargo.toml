@@ -8,7 +8,7 @@ aoc2025_utils = { path = "../utils" }
 itertools = "0.14.0"
 bitvec = "1.0.1"
 regex = "1"
-good_lp = "1.14.2"
+good_lp = { version = "1.14.2", features = ["microlp"] }
 
 [[bin]]
 name = "day10"
