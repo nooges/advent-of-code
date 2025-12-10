@@ -70,33 +70,26 @@ fn fewest_presses_indicator(machine: &Machine) -> u64 {
 }
 
 fn fewest_presses_joltage(machine: &Machine) -> u64 {
-    let num_cols = machine.buttons.len();
-    let mut A = vec![vec![0; machine.buttons.len()]; machine.joltages.len()];
-    machine.buttons.iter().enumerate().for_each(|(c, b)| {
-        b.iter().for_each(|r| {
-            A[*r as usize][c] = 1;
-        });
-    });
-
     let upper_bound = 1000;
 
     let mut vars = variables!();
-    let x: Vec<_> = (0..num_cols)
+    let x: Vec<_> = (0..machine.buttons.len())
         .map(|_| vars.add(variable().integer().min(0).max(upper_bound)))
         .collect();
 
     let objective: Expression = x.iter().cloned().sum();
 
-    let constraints: Vec<_> = A
+    let constraints: Vec<_> = machine
+        .joltages
         .iter()
-        .zip(machine.joltages.iter())
-        .map(|(row, &rhs)| {
-            let expr: Expression = row
+        .enumerate()
+        .map(|(r, b_i)| {
+            let expr: Expression = x
                 .iter()
-                .zip(x.iter())
-                .map(|(&a, &xi)| a as f64 * xi)
+                .enumerate()
+                .filter_map(|(c, x_i)| machine.buttons[c].contains(&(r as u32)).then(|| *x_i))
                 .sum();
-            constraint!(expr == rhs as f64)
+            constraint!(expr == *b_i as f64)
         })
         .collect();
 
