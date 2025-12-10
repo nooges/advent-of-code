@@ -5,7 +5,8 @@ use regex::Regex;
 #[derive(Debug)]
 struct Machine {
     indicator: BitVec,
-    buttons: Vec<BitVec>,
+    buttons: Vec<Vec<u32>>,
+    buttons_bv: Vec<BitVec>,
     joltages: Vec<u32>,
 }
 
@@ -28,11 +29,11 @@ fn parse_input(input: &str) -> Vec<Machine> {
             });
 
             let re = Regex::new(r"\(([^)]*)\)").unwrap();
-            let groups = re
+            let buttons = re
                 .captures_iter(buttons_str)
                 .map(|c| aoc2025_utils::extract_u32s(c.get(1).unwrap().as_str()))
                 .collect_vec();
-            let buttons = groups
+            let buttons_bv = buttons
                 .iter()
                 .map(|g| {
                     let mut button = bitvec![0; 16];
@@ -45,16 +46,17 @@ fn parse_input(input: &str) -> Vec<Machine> {
             Machine {
                 indicator,
                 buttons,
+                buttons_bv,
                 joltages,
             }
         })
         .collect_vec()
 }
 
-fn fewest_presses(machine: &Machine) -> u64 {
+fn fewest_presses_indicator(machine: &Machine) -> u64 {
     let mut presses = 1;
     loop {
-        if machine.buttons.iter().combinations(presses).any(|c| {
+        if machine.buttons_bv.iter().combinations(presses).any(|c| {
             c.iter()
                 .fold(machine.indicator.clone(), |acc, button| acc ^ *button)
                 == bitvec![0; 16]
@@ -65,19 +67,47 @@ fn fewest_presses(machine: &Machine) -> u64 {
     }
 }
 
+fn fewest_presses_joltage(machine: &Machine) -> u64 {
+    println!("{:?}", machine.joltages);
+    let mut presses = 1;
+    loop {
+        if machine
+            .buttons
+            .iter()
+            .combinations_with_replacement(presses)
+            .any(|c| {
+                let mut counters = vec![0; machine.joltages.len()];
+                c.iter().for_each(|button| {
+                    button.iter().for_each(|i| counters[*i as usize] += 1);
+                });
+                counters == machine.joltages
+            })
+        {
+            println!("{}", presses);
+            return presses as u64;
+        }
+        presses += 1;
+    }
+}
+
 fn part1(input: &str) -> u64 {
     let machines = parse_input(input);
-    machines.iter().map(fewest_presses).sum()
+    machines.iter().map(fewest_presses_indicator).sum()
 }
 
 fn part2(input: &str) -> u64 {
-    0
+    let machines = parse_input(input);
+    machines
+        .iter()
+        .sorted_by_key(|m| m.joltages.len())
+        .map(fewest_presses_joltage)
+        .sum()
 }
 
 fn main() -> std::io::Result<()> {
     let input = include_str!("input.txt");
 
     aoc2025_utils::timeit_u64("Part 1", || part1(input));
-    //aoc2025_utils::timeit_u64("Part 2", || part2(input));
+    aoc2025_utils::timeit_u64("Part 2", || part2(input));
     Ok(())
 }
