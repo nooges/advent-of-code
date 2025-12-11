@@ -18,52 +18,45 @@ fn parse_input(input: &str) -> HashMap<String, HashSet<String>> {
     )
 }
 
-fn traverse(nodes: &HashMap<String, HashSet<String>>, node_name: &str) -> u64 {
-    if node_name == "out" {
-        return 1;
-    }
-    nodes[node_name].iter().map(|n| traverse(nodes, n)).sum()
-}
-
-fn traverse2(
+fn dfs(
     nodes: &HashMap<String, HashSet<String>>,
     node_name: &str,
-    visited: &HashSet<String>,
+    goal: &str,
+    mem: &mut HashMap<String, u64>,
 ) -> u64 {
-    println!("{:?}", visited);
-    if node_name == "out" {
-        if visited.contains("fft") && visited.contains("dac") {
-            return 1;
-        }
-        return 0;
+    if let Some(v) = mem.get(node_name) {
+        *v
+    } else if node_name == goal {
+        1
+    } else if node_name == "out" {
+        0
+    } else {
+        let sum = nodes[node_name]
+            .iter()
+            .map(|n| dfs(nodes, n, goal, mem))
+            .sum();
+        mem.insert(node_name.to_string(), sum);
+        sum
     }
-    let mut new_visited = visited.clone();
-    new_visited.insert(node_name.to_string());
-    nodes[node_name]
-        .iter()
-        .filter_map(|n| {
-            if n == "svr" {
-                return None;
-            }
-            Some(traverse2(nodes, n, &new_visited))
-        })
-        .sum()
 }
 
 fn part1(input: &str) -> u64 {
     let devices = parse_input(input);
-    traverse(&devices, "you")
+    dfs(&devices, "you", "out", &mut HashMap::default())
 }
 
 fn part2(input: &str) -> u64 {
     let devices = parse_input(input);
-    traverse2(&devices, "svr", &HashSet::default())
+    // No paths from dac to fft, so just do svr -> fft -> dac -> out
+    dfs(&devices, "svr", "fft", &mut HashMap::default())
+        * dfs(&devices, "fft", "dac", &mut HashMap::default())
+        * dfs(&devices, "dac", "out", &mut HashMap::default())
 }
 
 fn main() -> std::io::Result<()> {
-    let input = include_str!("sample2.txt");
+    let input = include_str!("input.txt");
 
-    //aoc2025_utils::timeit_u64("Part 1", || part1(input));
+    aoc2025_utils::timeit_u64("Part 1", || part1(input));
     aoc2025_utils::timeit_u64("Part 2", || part2(input));
     Ok(())
 }
