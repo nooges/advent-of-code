@@ -25,6 +25,31 @@ fn traverse(nodes: &HashMap<String, HashSet<String>>, node_name: &str) -> u64 {
     nodes[node_name].iter().map(|n| traverse(nodes, n)).sum()
 }
 
+fn traverse2(
+    nodes: &HashMap<String, HashSet<String>>,
+    node_name: &str,
+    visited: &HashSet<String>,
+) -> u64 {
+    println!("{:?}", visited);
+    if node_name == "out" {
+        if visited.contains("fft") && visited.contains("dac") {
+            return 1;
+        }
+        return 0;
+    }
+    let mut new_visited = visited.clone();
+    new_visited.insert(node_name.to_string());
+    nodes[node_name]
+        .iter()
+        .filter_map(|n| {
+            if n == "svr" {
+                return None;
+            }
+            Some(traverse2(nodes, n, &new_visited))
+        })
+        .sum()
+}
+
 fn part1(input: &str) -> u64 {
     let devices = parse_input(input);
     traverse(&devices, "you")
@@ -32,13 +57,13 @@ fn part1(input: &str) -> u64 {
 
 fn part2(input: &str) -> u64 {
     let devices = parse_input(input);
-    0
+    traverse2(&devices, "svr", &HashSet::default())
 }
 
 fn main() -> std::io::Result<()> {
-    let input = include_str!("input.txt");
+    let input = include_str!("sample2.txt");
 
-    aoc2025_utils::timeit_u64("Part 1", || part1(input));
-    //aoc2025_utils::timeit_u64("Part 2", || part2(input));
+    //aoc2025_utils::timeit_u64("Part 1", || part1(input));
+    aoc2025_utils::timeit_u64("Part 2", || part2(input));
     Ok(())
 }
