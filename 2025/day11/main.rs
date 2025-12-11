@@ -52,8 +52,12 @@ fn part1(input: &str) -> u64 {
 
 fn part2(input: &str) -> u64 {
     let devices = parse_input(input);
-    // No paths from dac to fft, so just do svr -> fft -> dac -> out
-    dfs(&devices, "svr", "fft") * dfs(&devices, "fft", "dac") * dfs(&devices, "dac", "out")
+    let dac_to_fft = dfs(&devices, "dac", "fft");
+    if dac_to_fft == 0 {
+        dfs(&devices, "svr", "fft") * dfs(&devices, "fft", "dac") * dfs(&devices, "dac", "out")
+    } else {
+        dfs(&devices, "svr", "dac") * dac_to_fft * dfs(&devices, "fft", "out")
+    }
 }
 
 fn main() -> std::io::Result<()> {
