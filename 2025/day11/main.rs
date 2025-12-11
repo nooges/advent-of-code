@@ -24,19 +24,20 @@ fn dfs(
     goal: &str,
     mem: &mut HashMap<String, u64>,
 ) -> u64 {
-    if let Some(v) = mem.get(node_name) {
-        *v
-    } else if node_name == goal {
-        1
-    } else if node_name == "out" {
-        0
-    } else {
-        let sum = nodes[node_name]
-            .iter()
-            .map(|n| dfs(nodes, n, goal, mem))
-            .sum();
-        mem.insert(node_name.to_string(), sum);
-        sum
+    match mem.get(node_name) {
+        Some(v) => *v,
+        None => match node_name {
+            n if n == goal => 1,
+            "out" => 0,
+            _ => {
+                let sum = nodes[node_name]
+                    .iter()
+                    .map(|n| dfs(nodes, n, goal, mem))
+                    .sum();
+                mem.insert(node_name.to_string(), sum);
+                sum
+            }
+        },
     }
 }
 
