@@ -18,7 +18,11 @@ fn parse_input(input: &str) -> HashMap<String, HashSet<String>> {
     )
 }
 
-fn dfs(
+fn dfs(nodes: &HashMap<String, HashSet<String>>, node_name: &str, goal: &str) -> u64 {
+    dfs_helper(nodes, node_name, goal, &mut HashMap::default())
+}
+
+fn dfs_helper(
     nodes: &HashMap<String, HashSet<String>>,
     node_name: &str,
     goal: &str,
@@ -32,7 +36,7 @@ fn dfs(
             _ => {
                 let sum = nodes[node_name]
                     .iter()
-                    .map(|n| dfs(nodes, n, goal, mem))
+                    .map(|n| dfs_helper(nodes, n, goal, mem))
                     .sum();
                 mem.insert(node_name.to_string(), sum);
                 sum
@@ -43,15 +47,13 @@ fn dfs(
 
 fn part1(input: &str) -> u64 {
     let devices = parse_input(input);
-    dfs(&devices, "you", "out", &mut HashMap::default())
+    dfs(&devices, "you", "out")
 }
 
 fn part2(input: &str) -> u64 {
     let devices = parse_input(input);
     // No paths from dac to fft, so just do svr -> fft -> dac -> out
-    dfs(&devices, "svr", "fft", &mut HashMap::default())
-        * dfs(&devices, "fft", "dac", &mut HashMap::default())
-        * dfs(&devices, "dac", "out", &mut HashMap::default())
+    dfs(&devices, "svr", "fft") * dfs(&devices, "fft", "dac") * dfs(&devices, "dac", "out")
 }
 
 fn main() -> std::io::Result<()> {
